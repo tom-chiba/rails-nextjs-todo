@@ -6,6 +6,21 @@
     "playwright@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true
+    "claude-code-setup@claude-plugins-official": true,
+    "complete-workflow-system@thkt-development-workflows": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/linuxbrew/.linuxbrew/bin/guardrails",
+            "timeout": 1000
+          }
+        ]
+      }
+    ]
   }
 }
