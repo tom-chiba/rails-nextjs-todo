@@ -48,7 +48,7 @@ bin/ci                             # ローカルCI: rubocop, brakeman, bundler-
 ## フロントエンドコマンド (`fe/` ディレクトリで実行)
 
 ```bash
-npm run dev                        # 開発サーバー起動 (ポート3000)
+npm run dev                        # 開発サーバー起動 (ポート3001)
 npm run build                      # プロダクションビルド
 npm test                           # テスト実行 (Vitest)
 npm run test:watch                 # テスト監視モード (開発中)
