@@ -50,6 +50,8 @@ bin/ci                             # ローカルCI: rubocop, brakeman, bundler-
 ```bash
 npm run dev                        # 開発サーバー起動 (ポート3000)
 npm run build                      # プロダクションビルド
+npm test                           # テスト実行 (Vitest)
+npm run test:watch                 # テスト監視モード (開発中)
 npm run lint                       # Biomeチェック (lint)
 npm run format                     # Biomeフォーマット (自動修正)
 ```

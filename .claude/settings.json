@@ -1,13 +1,10 @@
 {
-  "enabledPlugins": {
-    "frontend-design@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true,
-    "complete-workflow-system@thkt-development-workflows": true
+  "permissions": {
+    "allow": [
+      "WebFetch",
+      "WebSearch",
+      "Edit(/fe/app/**)"
+    ]
   },
   "hooks": {
     "PreToolUse": [
@@ -22,5 +19,15 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "complete-workflow-system@thkt-development-workflows": true
   }
 }
