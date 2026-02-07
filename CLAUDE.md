@@ -54,6 +54,7 @@ npm test                           # テスト実行 (Vitest)
 npm run test:watch                 # テスト監視モード (開発中)
 npm run lint                       # Biomeチェック (lint)
 npm run format                     # Biomeフォーマット (自動修正)
+npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
 ```
 
 ## バックエンド重要事項
