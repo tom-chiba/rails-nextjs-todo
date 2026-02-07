@@ -3,7 +3,13 @@
     "allow": [
       "WebFetch",
       "WebSearch",
-      "Edit(/fe/app/**)"
+      "Edit(/fe/app/**)",
+      "Bash(mkdir *)",
+      "Bash(npm test)",
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run format)",
+      "Bash(npm run typecheck)"
     ]
   },
   "hooks": {
@@ -28,6 +34,7 @@
     "commit-commands@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "complete-workflow-system@thkt-development-workflows": true
+    "complete-workflow-system@thkt-development-workflows": true,
+    "code-simplifier@claude-plugins-official": true
   }
 }

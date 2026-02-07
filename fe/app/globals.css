@@ -1,26 +1,220 @@
 @import "tailwindcss";
 
+/* ── Washi + Ink Theme ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Paper tones */
+  --washi-cream: #f5f0e8;
+  --washi-warm: #ece5d8;
+  --washi-highlight: #faf7f0;
+
+  /* Ink tones */
+  --ink-black: #1a1a1a;
+  --ink-dark: #2d2d2d;
+  --ink-medium: #5c5c5c;
+  --ink-light: #8a8a8a;
+  --ink-faint: #b8b0a4;
+
+  /* Accent — vermillion seal */
+  --accent-vermillion: #c23b22;
+  --accent-vermillion-soft: #d4604e;
+
+  /* States */
+  --done-wash: #e8e2d6;
+  --done-ink: #a09888;
+
+  /* Shadows */
+  --shadow-ink: rgba(26, 26, 26, 0.08);
+  --shadow-ink-heavy: rgba(26, 26, 26, 0.15);
+
+  /* Mapped tokens */
+  --background: var(--washi-cream);
+  --foreground: var(--ink-black);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-washi-cream: var(--washi-cream);
+  --color-washi-warm: var(--washi-warm);
+  --color-washi-highlight: var(--washi-highlight);
+  --color-ink-black: var(--ink-black);
+  --color-ink-dark: var(--ink-dark);
+  --color-ink-medium: var(--ink-medium);
+  --color-ink-light: var(--ink-light);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent-vermillion: var(--accent-vermillion);
+  --color-accent-vermillion-soft: var(--accent-vermillion-soft);
+  --color-done-wash: var(--done-wash);
+  --color-done-ink: var(--done-ink);
+  --font-sans: var(--font-zen-kaku);
+  --font-display: var(--font-dm-serif);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --washi-cream: #1c1a17;
+    --washi-warm: #252219;
+    --washi-highlight: #2a2720;
+
+    --ink-black: #e8e2d6;
+    --ink-dark: #d4cfc4;
+    --ink-medium: #a09888;
+    --ink-light: #7a7268;
+    --ink-faint: #4a4540;
+
+    --accent-vermillion: #e05a42;
+    --accent-vermillion-soft: #c2493a;
+
+    --done-wash: #2a2720;
+    --done-ink: #6a6258;
+
+    --shadow-ink: rgba(0, 0, 0, 0.2);
+    --shadow-ink-heavy: rgba(0, 0, 0, 0.35);
+
+    --background: var(--washi-cream);
+    --foreground: var(--ink-black);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-zen-kaku), serif;
+}
+
+/* ── Washi paper texture overlay ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ── Brush stroke animation ── */
+@keyframes brush-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes ink-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-brush-reveal {
+  animation: brush-reveal 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.animate-ink-drop {
+  animation: ink-drop 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease forwards;
+}
+
+/* ── Checkbox as seal stamp ── */
+.todo-checkbox {
+  appearance: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  border: 2px solid var(--ink-faint);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.todo-checkbox:hover {
+  border-color: var(--accent-vermillion-soft);
+}
+
+.todo-checkbox:checked {
+  background: var(--accent-vermillion);
+  border-color: var(--accent-vermillion);
+}
+
+.todo-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--washi-cream);
+  opacity: 0.4;
+}
+
+/* ── Vermillion underline for input focus ── */
+.ink-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--ink-faint);
+  outline: none;
+  transition: border-color 0.3s ease;
+  caret-color: var(--accent-vermillion);
+}
+
+.ink-input:focus {
+  border-bottom-color: var(--accent-vermillion);
+}
+
+.ink-input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* ── Strikethrough as brush stroke ── */
+.todo-done-text {
+  position: relative;
+  color: var(--done-ink);
+}
+
+.todo-done-text::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  height: 2px;
+  background: var(--done-ink);
+  animation: brush-reveal 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ink-faint);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-light);
 }
