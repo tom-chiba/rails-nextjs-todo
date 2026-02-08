@@ -58,6 +58,7 @@ npm run test:watch                 # テスト監視モード (開発中)
 npm run lint                       # Biomeチェック (lint)
 npm run format                     # Biomeフォーマット (自動修正)
 npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
+npm run generate:types             # OpenAPIスキーマからTypeScript型を自動生成
 ```
 
 ## バックエンド注意事項
@@ -84,6 +85,7 @@ npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
 - **Linter/Formatter**: Biome 2.2（ESLintではない）、Next.js・React推奨ルール適用済み
 - **パスエイリアス**: `@/*` はプロジェクトルート (`./`) にマッピング
 - **TypeScript**: strictモード有効
+- **API型自動生成**: `openapi-typescript` で BE の swagger.yaml から `app/generated/api.ts` を生成。`app/types.ts` が再エクスポートするファサード。API スキーマ変更時は `npm run generate:types` を実行
 
 ## CI (GitHub Actions)
 

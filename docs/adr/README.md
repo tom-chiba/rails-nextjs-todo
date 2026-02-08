@@ -20,6 +20,7 @@
 | [ADR-0008](0008-rspec-factorybot-for-backend-testing.md) | バックエンドテストにRSpec + FactoryBotを採用 | accepted | 2026-02-08 |
 | [ADR-0009](0009-dotenv-rails-for-env-management.md) | dotenv-railsによる環境変数管理 | accepted | 2026-02-08 |
 | [ADR-0010](0010-rswag-for-openapi-code-first.md) | rswagによるコードファーストOpenAPIスキーマ生成 | accepted | 2026-02-08 |
+| [ADR-0011](0011-openapi-typescript-type-generation.md) | openapi-typescriptによるTypeScript型自動生成 | accepted | 2026-02-08 |
 
 ## 新しいADRの作成方法
 

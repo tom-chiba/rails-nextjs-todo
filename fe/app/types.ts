@@ -1,7 +1,3 @@
-export type Todo = {
-  id: number;
-  text: string;
-  completed: boolean;
-  created_at: string;
-  updated_at: string;
-};
+import type { components } from "./generated/api";
+
+export type Todo = components["schemas"]["Todo"];
