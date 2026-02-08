@@ -35,6 +35,9 @@ bin/rspec spec/models              # モデルスペックのみ実行
 bin/rspec spec/models/todo_spec.rb             # 単一ファイルのスペック実行
 bin/rspec spec/models/todo_spec.rb:10          # 特定行のスペック実行
 
+# OpenAPI (rswag)
+bin/rake rswag:specs:swaggerize    # swagger.yaml 生成
+
 # Lint・セキュリティ
 bin/rubocop                        # RuboCop実行 (rubocop-rails-omakaseスタイル)
 bin/rubocop -a                     # 自動修正
@@ -57,6 +60,10 @@ npm run format                     # Biomeフォーマット (自動修正)
 npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
 ```
 
+## バックエンド注意事項
+
+- **binstub優先**: `bundle exec` ではなく `bin/` 経由でコマンドを実行すること（例: `bin/rspec`, `bin/rake`, `bin/rubocop`）
+
 ## バックエンド重要事項
 
 - **API-only**: `ApplicationController` は `ActionController::API` を継承
@@ -65,6 +72,7 @@ npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
 - **テスト**: RSpec + FactoryBot。スペックは `spec/` 配下。ファクトリは `spec/factories/`
 - **CORS**: Rack::Cors gemで `config/initializers/cors.rb` に設定。`CORS_ALLOWED_ORIGINS` 環境変数が必要
 - **環境変数**: `dotenv-rails` で `be/.env` を自動読み込み（development/test環境）
+- **OpenAPI**: rswagでrequest specからswagger.yaml を自動生成。Swagger UI は `/api-docs` で閲覧可能。swagger.yamlはgit管理
 - **デプロイ**: KamalによるDockerデプロイ、Thrusterによる HTTP高速化
 
 ## フロントエンド重要事項
