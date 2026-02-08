@@ -1,7 +1,0 @@
-buy_milk:
-  text: Buy milk
-  completed: false
-
-clean_room:
-  text: Clean room
-  completed: true
