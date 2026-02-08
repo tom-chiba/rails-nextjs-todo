@@ -56,4 +56,9 @@ group :development, :test do
 
   # Test data factories [https://github.com/thoughtbot/factory_bot_rails]
   gem "factory_bot_rails"
+
+  # OpenAPI spec generation from request specs [https://github.com/rswag/rswag]
+  gem "rswag-api"
+  gem "rswag-ui"
+  gem "rswag-specs"
 end

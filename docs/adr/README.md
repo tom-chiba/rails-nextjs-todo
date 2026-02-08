@@ -17,6 +17,9 @@
 | [ADR-0005](0005-vitest-for-frontend-testing.md) | Vitest をフロントエンドテストに採用 | accepted | 2026-02-07 |
 | [ADR-0006](0006-devcontainer-development-environment.md) | devcontainerによる開発環境統一 | accepted | 2026-02-07 |
 | [ADR-0007](0007-washi-sumi-ink-ui-theme.md) | 和紙×墨インクUIテーマ | accepted | 2026-02-07 |
+| [ADR-0008](0008-rspec-factorybot-for-backend-testing.md) | バックエンドテストにRSpec + FactoryBotを採用 | accepted | 2026-02-08 |
+| [ADR-0009](0009-dotenv-rails-for-env-management.md) | dotenv-railsによる環境変数管理 | accepted | 2026-02-08 |
+| [ADR-0010](0010-rswag-for-openapi-code-first.md) | rswagによるコードファーストOpenAPIスキーマ生成 | accepted | 2026-02-08 |
 
 ## 新しいADRの作成方法
 
