@@ -35,7 +35,8 @@
         "mhutchie.git-graph",
         "donjayamanne.githistory",
         "biomejs.biome",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "GitHub.vscode-pull-request-github"
       ]
     }
   }
