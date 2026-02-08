@@ -35,7 +35,7 @@ export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       <button
         type="button"
         onClick={() => onDelete(todo.id)}
-        className="text-ink-faint opacity-0 transition-all hover:text-accent-vermillion group-hover:opacity-100"
+        className="text-ink-faint opacity-0 transition-all hover:text-accent-vermillion group-hover:opacity-100 focus:opacity-100"
         aria-label={`Delete "${todo.text}"`}
       >
         <svg
