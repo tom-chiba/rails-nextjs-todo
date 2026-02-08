@@ -35,6 +35,7 @@
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
     "complete-workflow-system@thkt-development-workflows": true,
-    "code-simplifier@claude-plugins-official": true
+    "code-simplifier@claude-plugins-official": true,
+    "a11y-specialist-skills@a11y-specialist-skills": true
   }
 }
