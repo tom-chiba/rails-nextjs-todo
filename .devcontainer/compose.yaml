@@ -6,6 +6,9 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
 
+    env_file:
+    - ../be/.env
+
     volumes:
     - ../:/workspaces/${localWorkspaceFolderBasename}:cached
 
