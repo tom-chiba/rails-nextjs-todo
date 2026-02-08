@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import * as todosApi from "./api/todos";
 import { TodoInput } from "./components/todo-input";
 import type { Todo } from "./types";
 
@@ -24,29 +25,48 @@ const TodoFooter = dynamic(
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
+  const [loading, setLoading] = useState(true);
 
-  // rerender-functional-setstate: 関数型 setState で安定したコールバック
-  const addTodo = (text: string) => {
-    const id = crypto.randomUUID();
-    const createdAt = Date.now();
-    setTodos((prev) => [{ id, text, completed: false, createdAt }, ...prev]);
-  };
+  useEffect(() => {
+    todosApi
+      .getTodos()
+      .then(setTodos)
+      .finally(() => setLoading(false));
+  }, []);
 
-  const toggleTodo = (id: string) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
-      ),
-    );
-  };
+  const addTodo = useCallback(async (text: string) => {
+    const todo = await todosApi.createTodo(text);
+    setTodos((prev) => [todo, ...prev]);
+  }, []);
 
-  const deleteTodo = (id: string) => {
+  const toggleTodo = useCallback(
+    async (id: number) => {
+      const target = todos.find((t) => t.id === id);
+      if (!target) return;
+      const newCompleted = !target.completed;
+      setTodos((prev) =>
+        prev.map((todo) =>
+          todo.id === id ? { ...todo, completed: newCompleted } : todo,
+        ),
+      );
+      const updated = await todosApi.updateTodo(id, {
+        completed: newCompleted,
+      });
+      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    },
+    [todos],
+  );
+
+  const deleteTodo = useCallback(async (id: number) => {
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
-  };
+    await todosApi.deleteTodo(id);
+  }, []);
 
-  const clearCompleted = () => {
+  const clearCompleted = useCallback(async () => {
+    const completedTodos = todos.filter((t) => t.completed);
     setTodos((prev) => prev.filter((todo) => !todo.completed));
-  };
+    await Promise.all(completedTodos.map((t) => todosApi.deleteTodo(t.id)));
+  }, [todos]);
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -73,11 +93,17 @@ export default function Home() {
 
         <TodoInput onAdd={addTodo} />
 
-        <TodoList
-          todos={filteredTodos}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
-        />
+        {loading ? (
+          <div className="flex justify-center py-20 animate-fade-in">
+            <p className="text-ink-light text-sm tracking-wide">Loading...</p>
+          </div>
+        ) : (
+          <TodoList
+            todos={filteredTodos}
+            onToggle={toggleTodo}
+            onDelete={deleteTodo}
+          />
+        )}
 
         <TodoFooter
           todos={todos}

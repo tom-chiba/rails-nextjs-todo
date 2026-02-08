@@ -6,8 +6,8 @@ import { TodoItem } from "./todo-item";
 
 type TodoListProps = {
   todos: Todo[];
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
+  onToggle: (id: number) => void;
+  onDelete: (id: number) => void;
 };
 
 export function TodoList({ todos, onToggle, onDelete }: TodoListProps) {

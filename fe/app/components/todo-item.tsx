@@ -5,8 +5,8 @@ import type { Todo } from "../types";
 
 type TodoItemProps = {
   todo: Todo;
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
+  onToggle: (id: number) => void;
+  onDelete: (id: number) => void;
 };
 
 export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
