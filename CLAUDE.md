@@ -8,7 +8,7 @@ Rails 8.1 APIバックエンド (`be/`) と Next.js 16 フロントエンド (`f
 
 ## アーキテクチャ
 
-- **be/**: Rails 8.1.2 API-onlyアプリ (Ruby 4.0.1, SQLite3, Minitest)
+- **be/**: Rails 8.1.2 API-onlyアプリ (Ruby 4.0.1, SQLite3, RSpec, FactoryBot)
 - **fe/**: Next.js 16.1.6アプリ (React 19, TypeScript, Tailwind CSS v4, Biome)
 - フロントエンドとバックエンドは独立したアプリケーション（共有コードなし）
 - バックエンドはJSON APIを提供し、フロントエンドがそれを利用する
@@ -29,11 +29,11 @@ bin/rails db:migrate               # マイグレーション実行
 bin/rails db:test:prepare           # テスト用DB準備
 bin/rails db:seed                   # シードデータ投入
 
-# テスト
-bin/rails test                     # 全テスト実行
-bin/rails test test/models         # モデルテストのみ実行
-bin/rails test test/models/user_test.rb        # 単一ファイルのテスト実行
-bin/rails test test/models/user_test.rb:10     # 特定行のテスト実行
+# テスト (RSpec)
+bin/rspec                          # 全スペック実行
+bin/rspec spec/models              # モデルスペックのみ実行
+bin/rspec spec/models/todo_spec.rb             # 単一ファイルのスペック実行
+bin/rspec spec/models/todo_spec.rb:10          # 特定行のスペック実行
 
 # Lint・セキュリティ
 bin/rubocop                        # RuboCop実行 (rubocop-rails-omakaseスタイル)
@@ -62,7 +62,9 @@ npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
 - **API-only**: `ApplicationController` は `ActionController::API` を継承
 - **データベース**: 全環境でSQLite3を使用。本番環境ではcache・queue・cable用に個別のSQLiteファイル (Solid Cache, Solid Queue, Solid Cable)
 - **Lintスタイル**: `rubocop-rails-omakase` — Rails公式の規約スタイル
-- **CORS**: Rack::Cors gemは利用可能だが `config/initializers/cors.rb` でコメントアウト中。フロントエンド接続時に有効化が必要
+- **テスト**: RSpec + FactoryBot。スペックは `spec/` 配下。ファクトリは `spec/factories/`
+- **CORS**: Rack::Cors gemで `config/initializers/cors.rb` に設定。`CORS_ALLOWED_ORIGINS` 環境変数が必要
+- **環境変数**: `dotenv-rails` で `be/.env` を自動読み込み（development/test環境）
 - **デプロイ**: KamalによるDockerデプロイ、Thrusterによる HTTP高速化
 
 ## フロントエンド重要事項
@@ -80,4 +82,4 @@ npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
 バックエンドCI (`be/.github/workflows/ci.yml`) は3つの並列ジョブで構成:
 1. **セキュリティ**: Brakeman + Bundler Audit
 2. **Lint**: RuboCop
-3. **テスト**: `bin/rails db:test:prepare test`
+3. **テスト**: `bin/rails db:test:prepare && bin/rspec`
