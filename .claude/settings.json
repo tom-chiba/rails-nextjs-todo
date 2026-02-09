@@ -1,11 +1,22 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "WebFetch",
       "WebSearch",
       "Edit(/fe/app/**)",
       "Bash(mkdir *)",
+      "Bash(cd *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git checkout -b *)",
+      "Bash(git push -u origin *)",
       "Bash(gh issue view *)",
+      "Bash(gh pr create *)",
       "Bash(npm test)",
       "Bash(npm run build)",
       "Bash(npm run lint)",
