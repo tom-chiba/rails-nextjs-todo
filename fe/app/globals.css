@@ -148,6 +148,11 @@ body::before {
   flex-shrink: 0;
 }
 
+.todo-checkbox:focus-visible {
+  outline: 2px solid var(--accent-vermillion);
+  outline-offset: 2px;
+}
+
 .todo-checkbox:hover {
   border-color: var(--accent-vermillion-soft);
 }
