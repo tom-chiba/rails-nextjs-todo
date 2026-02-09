@@ -176,13 +176,17 @@ body::before {
   background: transparent;
   border: none;
   border-bottom: 2px solid var(--ink-faint);
-  outline: none;
   transition: border-color 0.3s ease;
   caret-color: var(--accent-vermillion);
 }
 
 .ink-input:focus {
   border-bottom-color: var(--accent-vermillion);
+}
+
+.ink-input:focus-visible {
+  outline: 2px solid var(--accent-vermillion);
+  outline-offset: 4px;
 }
 
 .ink-input::placeholder {
