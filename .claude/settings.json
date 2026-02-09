@@ -1,5 +1,6 @@
 {
   "env": {
+    "language": "日本語",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
