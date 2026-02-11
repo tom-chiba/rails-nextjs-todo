@@ -38,7 +38,7 @@ export function TodoFooter({
 
   return (
     <footer className="mt-8 flex items-center justify-between border-t border-ink-faint/20 pt-6">
-      <p className="text-sm text-ink-light tabular-nums">
+      <p className="text-sm text-ink-medium tabular-nums">
         <span className="font-medium text-ink-medium">{activeCount}</span>{" "}
         {activeCount === 1 ? "item" : "items"} remaining
       </p>
