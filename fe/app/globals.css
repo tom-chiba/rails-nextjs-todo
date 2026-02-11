@@ -20,7 +20,7 @@
 
   /* States */
   --done-wash: #e8e2d6;
-  --done-ink: #a09888;
+  --done-ink: #6e665c;
 
   /* Shadows */
   --shadow-ink: rgba(26, 26, 26, 0.08);
@@ -66,7 +66,7 @@
     --accent-vermillion-soft: #c2493a;
 
     --done-wash: #2a2720;
-    --done-ink: #6a6258;
+    --done-ink: #928879;
 
     --shadow-ink: rgba(0, 0, 0, 0.2);
     --shadow-ink-heavy: rgba(0, 0, 0, 0.35);
