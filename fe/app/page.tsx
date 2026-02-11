@@ -78,7 +78,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-start justify-center px-6 py-16 sm:py-24">
-      <main className="w-full max-w-lg">
+      <div className="w-full max-w-lg">
         <header className="mb-14 animate-ink-drop">
           <h1 className="font-display text-5xl tracking-tight text-ink-black sm:text-6xl">
             Sumi
@@ -91,19 +91,21 @@ export default function Home() {
           </div>
         </header>
 
-        <TodoInput onAdd={addTodo} />
+        <main>
+          <TodoInput onAdd={addTodo} />
 
-        {loading ? (
-          <div className="flex justify-center py-20 animate-fade-in">
-            <p className="text-ink-light text-sm tracking-wide">Loading...</p>
-          </div>
-        ) : (
-          <TodoList
-            todos={filteredTodos}
-            onToggle={toggleTodo}
-            onDelete={deleteTodo}
-          />
-        )}
+          {loading ? (
+            <div className="flex justify-center py-20 animate-fade-in">
+              <p className="text-ink-light text-sm tracking-wide">Loading...</p>
+            </div>
+          ) : (
+            <TodoList
+              todos={filteredTodos}
+              onToggle={toggleTodo}
+              onDelete={deleteTodo}
+            />
+          )}
+        </main>
 
         <TodoFooter
           todos={todos}
@@ -111,7 +113,7 @@ export default function Home() {
           onFilterChange={setFilter}
           onClearCompleted={clearCompleted}
         />
-      </main>
+      </div>
     </div>
   );
 }
