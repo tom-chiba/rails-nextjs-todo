@@ -91,7 +91,7 @@ export default function Home() {
           </div>
         </header>
 
-        <main>
+        <main id="main-content">
           <TodoInput onAdd={addTodo} />
 
           {loading ? (
