@@ -20,7 +20,11 @@ export function TodoInput({ onAdd }: TodoInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} aria-label="Add new todo" className="relative mb-12">
+    <form
+      onSubmit={handleSubmit}
+      aria-label="Add new todo"
+      className="relative mb-12"
+    >
       <div className="flex items-end gap-4">
         <input
           ref={inputRef}

@@ -38,10 +38,13 @@ export function TodoFooter({
 
   return (
     <footer className="mt-8 flex items-center justify-between border-t border-ink-faint/20 pt-6">
-      <p role="status" aria-live="polite" className="text-sm text-ink-medium tabular-nums">
+      <output
+        aria-live="polite"
+        className="text-sm text-ink-medium tabular-nums"
+      >
         <span className="font-medium text-ink-medium">{activeCount}</span>{" "}
         {activeCount === 1 ? "item" : "items"} remaining
-      </p>
+      </output>
 
       <nav className="flex gap-1" aria-label="Filter todos">
         {filters.map((f) => (
