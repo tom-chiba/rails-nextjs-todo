@@ -94,6 +94,7 @@ export default function Home() {
         <main id="main-content">
           <TodoInput onAdd={addTodo} />
 
+          <h2 className="sr-only">Todo list</h2>
           {loading ? (
             <div className="flex justify-center py-20 animate-fade-in">
               <p className="text-ink-light text-sm tracking-wide">Loading...</p>
