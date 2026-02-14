@@ -25,13 +25,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="en">
       <body className={`${dmSerif.variable} ${zenKaku.variable} antialiased`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-ink-black focus:px-4 focus:py-2 focus:text-washi-white focus:outline-none"
         >
-          メインコンテンツへスキップ
+          <span lang="ja">メインコンテンツへスキップ</span>
         </a>
         {children}
       </body>
