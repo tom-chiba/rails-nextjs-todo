@@ -46,6 +46,12 @@ bin/bundler-audit                  # Gem脆弱性監査
 
 # CI (全チェック一括実行)
 bin/ci                             # ローカルCI: rubocop, brakeman, bundler-audit, tests
+
+# デプロイ (Kamal)
+bin/kamal setup                    # 初回サーバーセットアップ
+bin/kamal deploy                   # デプロイ実行
+bin/kamal console                  # Railsコンソール接続
+bin/kamal logs                     # ログ確認
 ```
 
 ## フロントエンドコマンド (`fe/` ディレクトリで実行)
@@ -73,7 +79,8 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **テスト**: RSpec + FactoryBot。スペックは `spec/` 配下。ファクトリは `spec/factories/`
 - **環境変数**: `dotenv-rails` で `be/.env` を自動読み込み（development/test環境）
 - **OpenAPI**: rswagでrequest specからswagger.yaml を自動生成。Swagger UI は `/api-docs` で閲覧可能。swagger.yamlはgit管理
-- **デプロイ**: KamalによるDockerデプロイ、Thrusterによる HTTP高速化
+- **デプロイ**: Kamal → ConoHa VPS (Docker Hub レジストリ, Let's Encrypt SSL via Thruster)。設定は `config/deploy.yml`、シークレットは `.kamal/secrets`
+- **OpenAPI (本番)**: rswag は development/test のみ。本番では `defined?` ガード付きでルーティングから除外される（`config/routes.rb` 参照）
 
 ## フロントエンド重要事項
 
@@ -86,6 +93,7 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **TypeScript**: strictモード有効
 - **APIプロキシ**: `next.config.ts` の `rewrites` で `/api/*` リクエストをRailsバックエンドに転送。ブラウザからは同一オリジン。転送先は環境変数 `API_BASE_URL`（デフォルト: `http://localhost:3000`）
 - **API型自動生成**: `openapi-typescript` で BE の swagger.yaml から `app/generated/api.ts` を生成。`app/types.ts` が再エクスポートするファサード。API スキーマ変更時は `npm run generate:types` を実行
+- **デプロイ**: Vercel。`API_BASE_URL` 環境変数で BE の本番 URL を指定し、`next.config.ts` の rewrites で API プロキシ
 
 ## CI (GitHub Actions)
 
