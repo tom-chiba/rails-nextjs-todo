@@ -71,7 +71,6 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **データベース**: 全環境でSQLite3を使用。本番環境ではcache・queue・cable用に個別のSQLiteファイル (Solid Cache, Solid Queue, Solid Cable)
 - **Lintスタイル**: `rubocop-rails-omakase` — Rails公式の規約スタイル
 - **テスト**: RSpec + FactoryBot。スペックは `spec/` 配下。ファクトリは `spec/factories/`
-- **CORS**: Rack::Cors gemで `config/initializers/cors.rb` に設定。`CORS_ALLOWED_ORIGINS` 環境変数が必要
 - **環境変数**: `dotenv-rails` で `be/.env` を自動読み込み（development/test環境）
 - **OpenAPI**: rswagでrequest specからswagger.yaml を自動生成。Swagger UI は `/api-docs` で閲覧可能。swagger.yamlはgit管理
 - **デプロイ**: KamalによるDockerデプロイ、Thrusterによる HTTP高速化
@@ -85,6 +84,7 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **Linter/Formatter**: Biome 2.2（ESLintではない）、Next.js・React推奨ルール適用済み
 - **パスエイリアス**: `@/*` はプロジェクトルート (`./`) にマッピング
 - **TypeScript**: strictモード有効
+- **APIプロキシ**: `next.config.ts` の `rewrites` で `/api/*` リクエストをRailsバックエンドに転送。ブラウザからは同一オリジン。転送先は環境変数 `API_BASE_URL`（デフォルト: `http://localhost:3000`）
 - **API型自動生成**: `openapi-typescript` で BE の swagger.yaml から `app/generated/api.ts` を生成。`app/types.ts` が再エクスポートするファサード。API スキーマ変更時は `npm run generate:types` を実行
 
 ## CI (GitHub Actions)
