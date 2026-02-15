@@ -32,6 +32,9 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# CORS support for cross-origin API requests [https://github.com/cyu/rack-cors]
+gem "rack-cors"
+
 
 group :development, :test do
   # Load .env files automatically [https://github.com/bkeepers/dotenv]

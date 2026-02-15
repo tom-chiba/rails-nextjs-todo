@@ -79,7 +79,8 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **テスト**: RSpec + FactoryBot。スペックは `spec/` 配下。ファクトリは `spec/factories/`
 - **環境変数**: `dotenv-rails` で `be/.env` を自動読み込み（development/test環境）
 - **OpenAPI**: rswagでrequest specからswagger.yaml を自動生成。Swagger UI は `/api-docs` で閲覧可能。swagger.yamlはgit管理
-- **デプロイ**: Kamal → ConoHa VPS (Docker Hub レジストリ, Let's Encrypt SSL via Thruster)。設定は `config/deploy.yml`、シークレットは `.kamal/secrets`
+- **CORS**: `rack-cors` gem で FE からのクロスオリジンリクエストを許可。許可オリジンは環境変数 `CORS_ORIGINS`（デフォルト: `http://localhost:3001`）。設定は `config/initializers/cors.rb`
+- **デプロイ**: Kamal → ConoHa VPS (Docker Hub レジストリ, Let's Encrypt SSL via Thruster)。設定は `config/deploy.yml`、シークレットは `.kamal/secrets`。ドメイン: `rails-nextjs-todo.api.tom-chiba.com`
 - **OpenAPI (本番)**: rswag は development/test のみ。本番では `defined?` ガード付きでルーティングから除外される（`config/routes.rb` 参照）
 
 ## フロントエンド重要事項
@@ -91,9 +92,9 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **Linter/Formatter**: Biome 2.2（ESLintではない）、Next.js・React推奨ルール適用済み
 - **パスエイリアス**: `@/*` はプロジェクトルート (`./`) にマッピング
 - **TypeScript**: strictモード有効
-- **APIプロキシ**: `next.config.ts` の `rewrites` で `/api/*` リクエストをRailsバックエンドに転送。ブラウザからは同一オリジン。転送先は環境変数 `API_BASE_URL`（デフォルト: `http://localhost:3000`）
+- **API通信**: CORS 直接通信方式。FE からBE に直接リクエストを送信。BE の URL は環境変数 `NEXT_PUBLIC_API_BASE_URL`（デフォルト: `http://localhost:3000`）で指定
 - **API型自動生成**: `openapi-typescript` で BE の swagger.yaml から `app/generated/api.ts` を生成。`app/types.ts` が再エクスポートするファサード。API スキーマ変更時は `npm run generate:types` を実行
-- **デプロイ**: Vercel。`API_BASE_URL` 環境変数で BE の本番 URL を指定し、`next.config.ts` の rewrites で API プロキシ
+- **デプロイ**: Vercel。`NEXT_PUBLIC_API_BASE_URL` 環境変数で BE の本番 URL (`https://rails-nextjs-todo.api.tom-chiba.com`) を指定
 
 ## CI (GitHub Actions)
 

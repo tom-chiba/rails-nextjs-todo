@@ -22,7 +22,7 @@ servers:
 #
 proxy:
   ssl: true
-  host: rails-nextjs-todo.tom-chiba.com
+  host: rails-nextjs-todo.api.tom-chiba.com
 
 # Where you keep your container images.
 registry:
@@ -38,7 +38,8 @@ env:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true
-    HOST: rails-nextjs-todo.tom-chiba.com
+    HOST: rails-nextjs-todo.api.tom-chiba.com
+    CORS_ORIGINS: "https://rails-nextjs-todo.tom-chiba.com"
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
