@@ -22,6 +22,8 @@
 | [ADR-0010](0010-rswag-for-openapi-code-first.md) | rswagによるコードファーストOpenAPIスキーマ生成 | accepted | 2026-02-08 |
 | [ADR-0011](0011-openapi-typescript-type-generation.md) | openapi-typescriptによるTypeScript型自動生成 | accepted | 2026-02-08 |
 | [ADR-0012](0012-ci-openapi-schema-freshness-check.md) | CIでのOpenAPIスキーマ整合性チェック | accepted | 2026-02-08 |
+| [ADR-0013](0013-deployment-conoha-vps-vercel.md) | 本番デプロイ構成 — ConoHa VPS + Vercel | accepted | 2026-02-14 |
+| [ADR-0014](0014-cors-direct-communication.md) | rewritesプロキシ方式からCORS直接通信方式への移行 | accepted | 2026-02-15 |
 
 ## 新しいADRの作成方法
 
