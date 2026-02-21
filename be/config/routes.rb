@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resource :session
+  resources :passwords, param: :token
   if defined?(Rswag::Ui)
     mount Rswag::Ui::Engine => "/api-docs"
   end
