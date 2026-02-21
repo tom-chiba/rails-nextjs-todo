@@ -41,6 +41,6 @@
     }
   },
   "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.ssh/kagoya,target=/home/vscode/.ssh/id_rsa,type=bind,consistency=cached"
   ]
 }
