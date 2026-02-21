@@ -80,7 +80,7 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **環境変数**: `dotenv-rails` で `be/.env` を自動読み込み（development/test環境）
 - **OpenAPI**: rswagでrequest specからswagger.yaml を自動生成。Swagger UI は `/api-docs` で閲覧可能。swagger.yamlはgit管理
 - **CORS**: `rack-cors` gem で FE からのクロスオリジンリクエストを許可。許可オリジンは環境変数 `CORS_ORIGINS`（デフォルト: `http://localhost:3001`）。設定は `config/initializers/cors.rb`
-- **デプロイ**: Kamal → ConoHa VPS (Docker Hub レジストリ, Let's Encrypt SSL via Thruster)。設定は `config/deploy.yml`、シークレットは `.kamal/secrets`。ドメイン: `rails-nextjs-todo.api.tom-chiba.com`
+- **デプロイ**: Kamal → KAGOYA VPS (Docker Hub レジストリ, Let's Encrypt SSL via Thruster)。設定は `config/deploy.yml`、シークレットは `.kamal/secrets`。ドメイン: `rails-nextjs-todo.api.tom-chiba.com`
 - **OpenAPI (本番)**: rswag は development/test のみ。本番では `defined?` ガード付きでルーティングから除外される（`config/routes.rb` 参照）
 
 ## フロントエンド重要事項
