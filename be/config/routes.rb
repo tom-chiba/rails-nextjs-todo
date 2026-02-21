@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
-  resource :session
-  resources :passwords, param: :token
+  resource :session, only: %i[create destroy]
+  resources :passwords, param: :token, only: %i[create update]
+
   if defined?(Rswag::Ui)
     mount Rswag::Ui::Engine => "/api-docs"
   end

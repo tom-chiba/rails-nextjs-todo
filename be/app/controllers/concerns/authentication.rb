@@ -3,7 +3,6 @@ module Authentication
 
   included do
     before_action :require_authentication
-    helper_method :authenticated?
   end
 
   class_methods do
@@ -30,12 +29,7 @@ module Authentication
     end
 
     def request_authentication
-      session[:return_to_after_authenticating] = request.url
-      redirect_to new_session_path
-    end
-
-    def after_authentication_url
-      session.delete(:return_to_after_authenticating) || root_url
+      render json: { error: "Authentication required" }, status: :unauthorized
     end
 
     def start_new_session_for(user)
