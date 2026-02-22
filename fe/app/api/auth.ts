@@ -35,9 +35,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
   throw new AuthApiError(res.status, ["An unexpected error occurred"]);
 }
 
-export async function signUp(
-  input: RegistrationInput,
-): Promise<AuthResponse> {
+export async function signUp(input: RegistrationInput): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE}/auth/sign_up`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -81,11 +79,14 @@ export async function resetPassword(
   token: string,
   input: PasswordResetInput,
 ): Promise<MessageResponse> {
-  const res = await fetch(`${API_BASE}/auth/passwords/${encodeURIComponent(token)}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(input),
-  });
+  const res = await fetch(
+    `${API_BASE}/auth/passwords/${encodeURIComponent(token)}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(input),
+    },
+  );
   return handleResponse<MessageResponse>(res);
 }
