@@ -95,6 +95,18 @@ RSpec.describe "Api::V1::Auth::Passwords" do
       end
     end
 
+    context "with token for a deleted user" do
+      it "returns bad request" do
+        token = user.password_reset_token
+        user.destroy!
+
+        put api_v1_auth_password_path(token: token), params: { password: "newpassword", password_confirmation: "newpassword" }
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body["error"]).to include("invalid or has expired")
+      end
+    end
+
     context "with already-used token (password already changed)" do
       it "returns bad request" do
         token = user.password_reset_token

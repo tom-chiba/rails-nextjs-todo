@@ -23,7 +23,7 @@ class Api::V1::Auth::PasswordsController < ApplicationController
   private
     def set_user_by_token
       @user = User.find_by_password_reset_token!(params[:token])
-    rescue ActiveSupport::MessageVerifier::InvalidSignature
+    rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
       render json: { error: "Password reset link is invalid or has expired." }, status: :bad_request
     end
 end
