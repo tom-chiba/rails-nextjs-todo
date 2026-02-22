@@ -1,6 +1,8 @@
 require "swagger_helper"
 
 RSpec.describe "Api::V1::Todos", type: :request do
+  before { sign_in }
+
   path "/api/v1/todos" do
     get "Todo一覧を取得する" do
       tags "Todos"

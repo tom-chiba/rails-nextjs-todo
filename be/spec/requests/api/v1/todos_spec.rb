@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Todos" do
+  before { sign_in }
+
   describe "GET /api/v1/todos" do
     it "returns all todos" do
       create_list(:todo, 3)

@@ -8,6 +8,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      namespace :auth do
+        resource :session, only: %i[create destroy]
+        resources :passwords, param: :token, only: %i[create update]
+      end
+
       resources :todos, only: [ :index, :create, :update, :destroy ]
     end
   end
