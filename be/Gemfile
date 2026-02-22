@@ -36,6 +36,11 @@ gem "image_processing", "~> 1.2"
 gem "rack-cors"
 
 
+group :development do
+  # Preview emails in the browser instead of sending [https://github.com/ryanb/letter_opener]
+  gem "letter_opener"
+end
+
 group :development, :test do
   # Load .env files automatically [https://github.com/bkeepers/dotenv]
   gem "dotenv-rails"
