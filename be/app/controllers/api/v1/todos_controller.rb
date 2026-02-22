@@ -4,12 +4,12 @@ module Api
       before_action :set_todo, only: [ :update, :destroy ]
 
       def index
-        @todos = Todo.order(created_at: :desc)
+        @todos = Current.user.todos.order(created_at: :desc)
         render json: @todos
       end
 
       def create
-        @todo = Todo.new(todo_params)
+        @todo = Current.user.todos.new(todo_params)
 
         if @todo.save
           render json: @todo, status: :created
@@ -34,7 +34,7 @@ module Api
       private
 
       def set_todo
-        @todo = Todo.find(params.expect(:id))
+        @todo = Current.user.todos.find(params.expect(:id))
       end
 
       def todo_params
