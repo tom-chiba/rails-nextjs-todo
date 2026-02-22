@@ -1,4 +1,4 @@
-class SessionsController < ApplicationController
+class Api::V1::Auth::SessionsController < ApplicationController
   allow_unauthenticated_access only: :create
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> { render json: { error: "Rate limit exceeded. Try again later." }, status: :too_many_requests }
 
