@@ -74,4 +74,36 @@ RSpec.describe User, type: :model do
       expect(user.authenticate("wrong")).to be_falsey
     end
   end
+
+  describe "password reset token" do
+    let(:user) { create(:user) }
+
+    it "generates a password reset token" do
+      token = user.password_reset_token
+      expect(token).to be_present
+      expect(token).to be_a(String)
+    end
+
+    it "finds a user by valid password reset token" do
+      token = user.password_reset_token
+      found = User.find_by_password_reset_token(token)
+      expect(found).to eq(user)
+    end
+
+    it "returns nil for an invalid token" do
+      found = User.find_by_password_reset_token("invalid-token")
+      expect(found).to be_nil
+    end
+
+    it "invalidates token after password change" do
+      token = user.password_reset_token
+      user.update!(password: "newpassword", password_confirmation: "newpassword")
+      found = User.find_by_password_reset_token(token)
+      expect(found).to be_nil
+    end
+
+    it "reports the token expiration duration" do
+      expect(user.password_reset_token_expires_in).to eq(15.minutes)
+    end
+  end
 end
