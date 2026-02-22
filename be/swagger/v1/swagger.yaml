@@ -4,6 +4,119 @@ info:
   title: Todo API V1
   version: v1
 paths:
+  "/api/v1/auth/passwords":
+    post:
+      summary: パスワードリセットメール送信
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: 送信完了
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MessageResponse"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/PasswordResetRequestInput"
+  "/api/v1/auth/passwords/{token}":
+    parameters:
+    - name: token
+      in: path
+      description: パスワードリセットトークン
+      required: true
+      schema:
+        type: string
+    put:
+      summary: パスワードリセット実行
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: リセット成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MessageResponse"
+        '400':
+          description: 無効なトークン
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/PasswordResetInput"
+  "/api/v1/auth/sign_up":
+    post:
+      summary: ユーザー登録
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AuthResponse"
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationErrors"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/RegistrationInput"
+  "/api/v1/auth/sign_in":
+    post:
+      summary: ログイン
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '201':
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AuthResponse"
+        '401':
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/AuthInput"
+  "/api/v1/auth/sign_out":
+    delete:
+      summary: ログアウト
+      tags:
+      - Auth
+      responses:
+        '204':
+          description: ログアウト成功
+        '401':
+          description: 未認証
   "/api/v1/todos":
     get:
       summary: Todo一覧を取得する
@@ -18,6 +131,12 @@ paths:
                 type: array
                 items:
                   "$ref": "#/components/schemas/Todo"
+        '401':
+          description: 未認証
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
     post:
       summary: Todoを作成する
       tags:
@@ -32,6 +151,12 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Errors"
+        '401':
+          description: 未認証
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
       requestBody:
         content:
           application/json:
@@ -61,6 +186,12 @@ paths:
                 "$ref": "#/components/schemas/Errors"
         '404':
           description: Not Found
+        '401':
+          description: 未認証
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
       requestBody:
         content:
           application/json:
@@ -73,6 +204,8 @@ paths:
       responses:
         '204':
           description: 削除成功
+        '401':
+          description: 未認証
 servers:
 - url: http://localhost:3000
   description: Development server
@@ -111,10 +244,84 @@ components:
               type: boolean
       required:
       - todo
+    AuthInput:
+      type: object
+      properties:
+        email_address:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+      - email_address
+      - password
+    RegistrationInput:
+      type: object
+      properties:
+        email_address:
+          type: string
+          format: email
+        password:
+          type: string
+        password_confirmation:
+          type: string
+      required:
+      - email_address
+      - password
+      - password_confirmation
+    PasswordResetRequestInput:
+      type: object
+      properties:
+        email_address:
+          type: string
+          format: email
+      required:
+      - email_address
+    PasswordResetInput:
+      type: object
+      properties:
+        password:
+          type: string
+        password_confirmation:
+          type: string
+      required:
+      - password
+      - password_confirmation
+    AuthResponse:
+      type: object
+      properties:
+        email_address:
+          type: string
+          format: email
+      required:
+      - email_address
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
     Errors:
       type: object
       properties:
         errors:
           type: object
+      required:
+      - errors
+    ValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
       required:
       - errors
