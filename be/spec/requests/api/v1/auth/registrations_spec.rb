@@ -62,6 +62,15 @@ RSpec.describe "Api::V1::Auth::Registrations" do
       end
     end
 
+    context "with missing password_confirmation" do
+      it "returns unprocessable_entity" do
+        post api_v1_auth_sign_up_path, params: { email_address: "newuser@example.com", password: "password" }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to include(a_string_matching(/Password confirmation/))
+      end
+    end
+
     context "with missing password" do
       it "returns unprocessable_entity" do
         post api_v1_auth_sign_up_path, params: { email_address: "newuser@example.com" }

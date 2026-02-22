@@ -65,12 +65,12 @@ RSpec.describe User, type: :model do
 
   describe "has_secure_password" do
     it "authenticates with correct password" do
-      user = create(:user, password: "secure123")
+      user = create(:user, password: "secure123", password_confirmation: "secure123")
       expect(user.authenticate("secure123")).to eq(user)
     end
 
     it "does not authenticate with incorrect password" do
-      user = create(:user, password: "secure123")
+      user = create(:user, password: "secure123", password_confirmation: "secure123")
       expect(user.authenticate("wrong")).to be_falsey
     end
   end
