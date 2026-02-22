@@ -13,6 +13,18 @@ RSpec.describe User, type: :model do
       user.sessions.create!(user_agent: "test", ip_address: "127.0.0.1")
       expect { user.destroy }.to change(Session, :count).by(-1)
     end
+
+    it "has many todos" do
+      user = create(:user)
+      todo = create(:todo, user: user)
+      expect(user.todos).to include(todo)
+    end
+
+    it "destroys associated todos when destroyed" do
+      user = create(:user)
+      create(:todo, user: user)
+      expect { user.destroy }.to change(Todo, :count).by(-1)
+    end
   end
 
   describe "validations" do

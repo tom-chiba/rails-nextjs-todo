@@ -40,10 +40,73 @@ RSpec.configure do |config|
             },
             required: %w[todo]
           },
+          AuthInput: {
+            type: :object,
+            properties: {
+              email_address: { type: :string, format: "email" },
+              password: { type: :string }
+            },
+            required: %w[email_address password]
+          },
+          RegistrationInput: {
+            type: :object,
+            properties: {
+              email_address: { type: :string, format: "email" },
+              password: { type: :string },
+              password_confirmation: { type: :string }
+            },
+            required: %w[email_address password password_confirmation]
+          },
+          PasswordResetRequestInput: {
+            type: :object,
+            properties: {
+              email_address: { type: :string, format: "email" }
+            },
+            required: %w[email_address]
+          },
+          PasswordResetInput: {
+            type: :object,
+            properties: {
+              password: { type: :string },
+              password_confirmation: { type: :string }
+            },
+            required: %w[password password_confirmation]
+          },
+          AuthResponse: {
+            type: :object,
+            properties: {
+              email_address: { type: :string, format: "email" }
+            },
+            required: %w[email_address]
+          },
+          MessageResponse: {
+            type: :object,
+            properties: {
+              message: { type: :string }
+            },
+            required: %w[message]
+          },
+          Error: {
+            type: :object,
+            properties: {
+              error: { type: :string }
+            },
+            required: %w[error]
+          },
           Errors: {
             type: :object,
             properties: {
               errors: { type: :object }
+            },
+            required: %w[errors]
+          },
+          ValidationErrors: {
+            type: :object,
+            properties: {
+              errors: {
+                type: :array,
+                items: { type: :string }
+              }
             },
             required: %w[errors]
           }
