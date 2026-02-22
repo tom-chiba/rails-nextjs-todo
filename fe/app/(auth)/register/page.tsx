@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthApiError, signIn } from "../../api/auth";
+import { AuthApiError, signUp } from "../../api/auth";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -18,7 +19,11 @@ export default function LoginPage() {
     setSubmitting(true);
 
     try {
-      await signIn({ email_address: email, password });
+      await signUp({
+        email_address: email,
+        password,
+        password_confirmation: passwordConfirmation,
+      });
       router.push("/");
     } catch (err) {
       if (err instanceof AuthApiError) {
@@ -33,7 +38,7 @@ export default function LoginPage() {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="mb-6 font-display text-2xl text-ink-black">Log in</h2>
+      <h2 className="mb-6 font-display text-2xl text-ink-black">Sign up</h2>
 
       {errors.length > 0 && (
         <div
@@ -75,10 +80,28 @@ export default function LoginPage() {
           <input
             id="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className="ink-input w-full py-2 text-ink-dark"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="password-confirmation"
+            className="mb-1 block text-sm text-ink-medium"
+          >
+            Password confirmation
+          </label>
+          <input
+            id="password-confirmation"
+            type="password"
+            autoComplete="new-password"
+            required
+            value={passwordConfirmation}
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
             className="ink-input w-full py-2 text-ink-dark"
           />
         </div>
@@ -88,26 +111,18 @@ export default function LoginPage() {
           disabled={submitting}
           className="w-full rounded bg-ink-black py-2.5 text-sm font-medium text-washi-cream transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {submitting ? "Logging in..." : "Log in"}
+          {submitting ? "Creating account..." : "Create account"}
         </button>
       </form>
 
-      <div className="mt-6 space-y-2 text-center text-sm text-ink-light">
+      <div className="mt-6 text-center text-sm text-ink-light">
         <p>
-          Don&apos;t have an account?{" "}
+          Already have an account?{" "}
           <Link
-            href="/register"
+            href="/login"
             className="text-accent-vermillion hover:underline"
           >
-            Sign up
-          </Link>
-        </p>
-        <p>
-          <Link
-            href="/forgot-password"
-            className="text-ink-medium hover:text-accent-vermillion"
-          >
-            Forgot your password?
+            Log in
           </Link>
         </p>
       </div>
