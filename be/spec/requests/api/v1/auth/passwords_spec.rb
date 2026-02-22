@@ -62,6 +62,17 @@ RSpec.describe "Api::V1::Auth::Passwords" do
       end
     end
 
+    context "with missing password confirmation" do
+      it "returns unprocessable entity" do
+        token = user.password_reset_token
+
+        put api_v1_auth_password_path(token: token), params: { password: "newpassword" }
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body["errors"]).to include(a_string_matching(/Password confirmation/))
+      end
+    end
+
     context "with mismatched password confirmation" do
       it "returns unprocessable entity" do
         token = user.password_reset_token
