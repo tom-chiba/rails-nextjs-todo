@@ -35,7 +35,6 @@ gem "image_processing", "~> 1.2"
 # CORS support for cross-origin API requests [https://github.com/cyu/rack-cors]
 gem "rack-cors"
 
-
 group :development, :test do
   # Load .env files automatically [https://github.com/bkeepers/dotenv]
   gem "dotenv-rails"
