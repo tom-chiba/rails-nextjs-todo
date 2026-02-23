@@ -8,7 +8,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
     return res.json();
   }
   if (res.status === 401) {
-    window.location.href = "/login";
+    // Client-only: Server Component から呼ばれた場合は redirect せずエラーのみ投げる
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
     throw new Error("Authentication required");
   }
   throw new Error(`API error: ${res.status}`);

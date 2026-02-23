@@ -86,23 +86,23 @@ export default function Home() {
             <h1 className="font-display text-5xl tracking-tight text-ink-black sm:text-6xl">
               Sumi
             </h1>
-            <nav
-              aria-label="User menu"
-              className="flex items-center gap-3 pt-2"
-            >
-              {email && (
+            {email && (
+              <nav
+                aria-label="User menu"
+                className="flex items-center gap-3 pt-2"
+              >
                 <span className="hidden text-xs text-ink-light sm:inline">
                   {email}
                 </span>
-              )}
-              <button
-                type="button"
-                onClick={signOut}
-                className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion"
-              >
-                Log out
-              </button>
-            </nav>
+                <button
+                  type="button"
+                  onClick={signOut}
+                  className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion"
+                >
+                  Log out
+                </button>
+              </nav>
+            )}
           </div>
           <div className="mt-2 flex items-center gap-3">
             <div className="h-px flex-1 bg-gradient-to-r from-accent-vermillion/60 to-transparent animate-brush-reveal" />
