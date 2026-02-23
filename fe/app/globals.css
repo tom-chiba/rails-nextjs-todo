@@ -193,6 +193,28 @@ body::before {
   color: var(--ink-faint);
 }
 
+/* ── Primary action button ── */
+.ink-button {
+  width: 100%;
+  border-radius: 0.25rem;
+  background: var(--ink-black);
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--washi-cream);
+  transition: opacity 0.15s ease;
+}
+
+.ink-button:hover {
+  opacity: 0.9;
+}
+
+.ink-button:disabled {
+  opacity: 0.5;
+}
+
 /* ── Strikethrough as brush stroke ── */
 .todo-done-text {
   position: relative;
