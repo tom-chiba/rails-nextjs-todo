@@ -24,6 +24,10 @@
 | [ADR-0012](0012-ci-openapi-schema-freshness-check.md) | CIでのOpenAPIスキーマ整合性チェック | accepted | 2026-02-08 |
 | [ADR-0013](0013-deployment-conoha-vps-vercel.md) | 本番デプロイ構成 — ConoHa VPS + Vercel | accepted | 2026-02-14 |
 | [ADR-0014](0014-cors-direct-communication.md) | rewritesプロキシ方式からCORS直接通信方式への移行 | accepted | 2026-02-15 |
+| [ADR-0015](0015-rails8-authentication-generator.md) | Rails 8 Authentication Generatorベースの認証基盤 | accepted | 2026-02-22 |
+| [ADR-0016](0016-cookie-session-authentication-for-api.md) | API-only構成でのセッション（Cookie）ベース認証 | accepted | 2026-02-22 |
+| [ADR-0017](0017-me-endpoint-for-user-info.md) | ユーザー情報取得を/meエンドポイントに統一 | accepted | 2026-02-23 |
+| [ADR-0018](0018-session-cookie-subdomain-sharing.md) | セッションCookieのサブドメイン間共有 | accepted | 2026-02-23 |
 
 ## 新しいADRの作成方法
 
