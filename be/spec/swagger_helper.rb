@@ -79,6 +79,14 @@ RSpec.configure do |config|
             },
             required: %w[email_address]
           },
+          MeResponse: {
+            type: :object,
+            properties: {
+              id: { type: :integer },
+              email_address: { type: :string, format: "email" }
+            },
+            required: %w[id email_address]
+          },
           MessageResponse: {
             type: :object,
             properties: {

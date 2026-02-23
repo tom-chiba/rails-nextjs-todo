@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthApiError, signUp } from "../../api/auth";
 import { FormErrors } from "../../components/form-errors";
-import { setUserEmail } from "../../lib/auth-cookie";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -27,12 +26,11 @@ export default function RegisterPage() {
     setSubmitting(true);
 
     try {
-      const res = await signUp({
+      await signUp({
         email_address: email,
         password,
         password_confirmation: passwordConfirmation,
       });
-      setUserEmail(res.email_address);
       router.push("/");
     } catch (err) {
       if (err instanceof AuthApiError) {

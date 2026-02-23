@@ -1,6 +1,7 @@
 import type {
   AuthInput,
   AuthResponse,
+  MeResponse,
   MessageResponse,
   PasswordResetInput,
   PasswordResetRequestInput,
@@ -53,6 +54,13 @@ export async function signIn(input: AuthInput): Promise<AuthResponse> {
     body: JSON.stringify(input),
   });
   return handleResponse<AuthResponse>(res);
+}
+
+export async function getMe(): Promise<MeResponse> {
+  const res = await fetch(`${API_BASE}/me`, {
+    credentials: "include",
+  });
+  return handleResponse<MeResponse>(res);
 }
 
 export async function signOut(): Promise<void> {

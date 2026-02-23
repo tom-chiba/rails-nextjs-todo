@@ -24,7 +24,7 @@ const TodoFooter = dynamic(
 );
 
 export default function Home() {
-  const { email, signOut } = useAuth();
+  const { email, loading: authLoading, signOut } = useAuth();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
   const [loading, setLoading] = useState(true);
@@ -86,7 +86,7 @@ export default function Home() {
             <h1 className="font-display text-5xl tracking-tight text-ink-black sm:text-6xl">
               Sumi
             </h1>
-            {email && (
+            {!authLoading && email && (
               <nav
                 aria-label="User menu"
                 className="flex items-center gap-3 pt-2"

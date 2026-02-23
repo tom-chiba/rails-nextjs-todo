@@ -1,30 +1,34 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
-import { signOut as apiSignOut } from "../api/auth";
-import { clearUserEmail, getUserEmail } from "../lib/auth-cookie";
+import { useEffect, useState } from "react";
+import { getMe, signOut as apiSignOut } from "../api/auth";
+import type { MeResponse } from "../types";
 
-function subscribe(onStoreChange: () => void): () => void {
-  window.addEventListener("auth-change", onStoreChange);
-  return () => window.removeEventListener("auth-change", onStoreChange);
-}
-
-function useEmail(): string | null {
-  return useSyncExternalStore(subscribe, getUserEmail, () => null);
-}
-
+// TODO: useAuth() は呼び出しごとに独立して getMe() を実行するため、
+// 複数コンポーネントで使用すると N 回 API コールが発生する。
+// 使用箇所が増えた場合は React Context または SWR で重複排除すること。
+// See: https://github.com/tom-chiba/rails-nextjs-todo/issues/59
 export function useAuth() {
   const router = useRouter();
-  const email = useEmail();
+  const [user, setUser] = useState<MeResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getMe()
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
 
   return {
-    email,
+    email: user?.email_address ?? null,
+    loading,
     async signOut() {
       try {
         await apiSignOut();
       } finally {
-        clearUserEmail();
+        setUser(null);
         router.push("/login");
       }
     },
