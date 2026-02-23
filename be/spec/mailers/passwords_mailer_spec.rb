@@ -19,7 +19,7 @@ RSpec.describe PasswordsMailer do
 
     it "includes the reset URL with token in the body" do
       expect(mail.body.encoded).to include("token=")
-      expect(mail.body.encoded).to include("/auth/reset-password")
+      expect(mail.body.encoded).to include("/reset-password")
     end
 
     it "includes the expiration notice" do
@@ -30,7 +30,7 @@ RSpec.describe PasswordsMailer do
       original = ENV["FRONTEND_URL"]
       ENV["FRONTEND_URL"] = "https://myapp.example.com"
       env_mail = described_class.reset(user)
-      expect(env_mail.body.encoded).to include("https://myapp.example.com/auth/reset-password")
+      expect(env_mail.body.encoded).to include("https://myapp.example.com/reset-password")
     ensure
       ENV["FRONTEND_URL"] = original
     end
