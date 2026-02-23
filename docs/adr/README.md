@@ -28,6 +28,7 @@
 | [ADR-0016](0016-cookie-session-authentication-for-api.md) | API-only構成でのセッション（Cookie）ベース認証 | accepted | 2026-02-22 |
 | [ADR-0017](0017-me-endpoint-for-user-info.md) | ユーザー情報取得を/meエンドポイントに統一 | accepted | 2026-02-23 |
 | [ADR-0018](0018-session-cookie-subdomain-sharing.md) | セッションCookieのサブドメイン間共有 | accepted | 2026-02-23 |
+| [ADR-0019](0019-kamal-destinations-for-deploy-config.md) | Kamal Destinationsによるデプロイ先設定の分離 | accepted | 2026-02-23 |
 
 ## 新しいADRの作成方法
 

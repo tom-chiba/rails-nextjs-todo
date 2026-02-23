@@ -32,6 +32,10 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Ignore Kamal destination deploy files (contain server IPs and domains).
+/config/deploy.*.yml
+!/config/deploy.*.yml.example
+
 # Ignore RSpec examples status cache.
 /spec/examples.txt
 

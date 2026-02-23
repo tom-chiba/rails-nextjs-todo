@@ -10,12 +10,14 @@
 
 ## 本番デプロイ
 
-### バックエンド (Kamal → ConoHa VPS)
+### バックエンド (Kamal Destinations → VPS)
 
 1. 環境変数 `KAMAL_REGISTRY_PASSWORD` に Docker Hub トークンを設定（`export KAMAL_REGISTRY_PASSWORD=...`）
 2. `be/config/master.key` が存在することを確認（`bin/rails credentials:edit` で生成可能）
-3. 初回セットアップ: `be/` ディレクトリで `bin/kamal setup`
-4. 以降のデプロイ: `bin/kamal deploy`
+3. デプロイ先設定ファイルを作成: `cp config/deploy.production.yml.example config/deploy.production.yml` し、実際のIP・ドメインを記入
+4. 初回セットアップ: `be/` ディレクトリで `bin/kamal setup -d production`
+5. 以降のデプロイ: `bin/kamal deploy -d production`
+6. サーバー移行時は `config/deploy.production.yml` のIPを書き換えてデプロイ（コミット不要）
 
 ### フロントエンド (Vercel)
 
