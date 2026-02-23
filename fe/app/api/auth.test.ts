@@ -35,10 +35,12 @@ describe("getMe", () => {
       json: () => Promise.resolve({ error: "Authentication required" }),
     });
 
-    await expect(getMe()).rejects.toThrow(AuthApiError);
-    await expect(getMe()).rejects.toMatchObject({
-      status: 401,
-      errors: ["Authentication required"],
-    });
+    await expect(getMe()).rejects.toThrow(
+      expect.objectContaining({
+        name: "AuthApiError",
+        status: 401,
+        errors: ["Authentication required"],
+      }),
+    );
   });
 });
