@@ -5,6 +5,10 @@ import Home from "./page";
 
 let nextId = 1;
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
 vi.mock("./api/todos", () => ({
   getTodos: vi.fn(),
   createTodo: vi.fn(),
