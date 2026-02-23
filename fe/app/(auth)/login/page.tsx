@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthApiError, signIn } from "../../api/auth";
 import { FormErrors } from "../../components/form-errors";
+import { setUserEmail } from "../../lib/auth-cookie";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +20,8 @@ export default function LoginPage() {
     setSubmitting(true);
 
     try {
-      await signIn({ email_address: email, password });
+      const res = await signIn({ email_address: email, password });
+      setUserEmail(res.email_address);
       router.push("/");
     } catch (err) {
       if (err instanceof AuthApiError) {
