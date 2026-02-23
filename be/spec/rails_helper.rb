@@ -22,4 +22,6 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
   config.include AuthenticationHelper, type: :request
+
+  config.before(:each, type: :request) { https! }
 end
