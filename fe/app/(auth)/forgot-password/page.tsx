@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AuthApiError, requestPasswordReset } from "../../api/auth";
+import { FormErrors } from "../../components/form-errors";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -58,20 +59,9 @@ export default function ForgotPasswordPage() {
         Enter your email and we&apos;ll send you a link to reset your password.
       </p>
 
-      {errors.length > 0 && (
-        <div
-          role="alert"
-          className="mb-4 rounded bg-accent-vermillion/10 p-3 text-sm text-accent-vermillion"
-        >
-          <ul>
-            {errors.map((error) => (
-              <li key={error}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <FormErrors errors={errors} />
 
-      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm text-ink-medium">
             Email
@@ -88,11 +78,7 @@ export default function ForgotPasswordPage() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded bg-ink-black py-2.5 text-sm font-medium text-washi-cream transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting} className="ink-button">
           {submitting ? "Sending..." : "Send reset link"}
         </button>
       </form>

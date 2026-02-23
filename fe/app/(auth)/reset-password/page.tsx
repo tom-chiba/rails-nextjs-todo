@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { AuthApiError, resetPassword } from "../../api/auth";
+import { FormErrors } from "../../components/form-errors";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -37,6 +38,12 @@ function ResetPasswordForm() {
     e.preventDefault();
     if (!token) return;
     setErrors([]);
+
+    if (password !== passwordConfirmation) {
+      setErrors(["Passwords do not match"]);
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -81,20 +88,9 @@ function ResetPasswordForm() {
         Set new password
       </h2>
 
-      {errors.length > 0 && (
-        <div
-          role="alert"
-          className="mb-4 rounded bg-accent-vermillion/10 p-3 text-sm text-accent-vermillion"
-        >
-          <ul>
-            {errors.map((error) => (
-              <li key={error}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <FormErrors errors={errors} />
 
-      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
             htmlFor="password"
@@ -131,11 +127,7 @@ function ResetPasswordForm() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded bg-ink-black py-2.5 text-sm font-medium text-washi-cream transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting} className="ink-button">
           {submitting ? "Resetting..." : "Reset password"}
         </button>
       </form>

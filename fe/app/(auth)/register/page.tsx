@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthApiError, signUp } from "../../api/auth";
+import { FormErrors } from "../../components/form-errors";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,6 +17,12 @@ export default function RegisterPage() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors([]);
+
+    if (password !== passwordConfirmation) {
+      setErrors(["Passwords do not match"]);
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -40,20 +47,9 @@ export default function RegisterPage() {
     <div className="animate-fade-in">
       <h2 className="mb-6 font-display text-2xl text-ink-black">Sign up</h2>
 
-      {errors.length > 0 && (
-        <div
-          role="alert"
-          className="mb-4 rounded bg-accent-vermillion/10 p-3 text-sm text-accent-vermillion"
-        >
-          <ul>
-            {errors.map((error) => (
-              <li key={error}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <FormErrors errors={errors} />
 
-      <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm text-ink-medium">
             Email
@@ -106,11 +102,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded bg-ink-black py-2.5 text-sm font-medium text-washi-cream transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting} className="ink-button">
           {submitting ? "Creating account..." : "Create account"}
         </button>
       </form>
