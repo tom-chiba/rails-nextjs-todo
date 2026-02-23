@@ -1,30 +1,27 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
-import { signOut as apiSignOut } from "../api/auth";
-import { clearUserEmail, getUserEmail } from "../lib/auth-cookie";
-
-function subscribe(onStoreChange: () => void): () => void {
-  window.addEventListener("auth-change", onStoreChange);
-  return () => window.removeEventListener("auth-change", onStoreChange);
-}
-
-function useEmail(): string | null {
-  return useSyncExternalStore(subscribe, getUserEmail, () => null);
-}
+import { useEffect, useState } from "react";
+import { getMe, signOut as apiSignOut } from "../api/auth";
+import type { MeResponse } from "../types";
 
 export function useAuth() {
   const router = useRouter();
-  const email = useEmail();
+  const [user, setUser] = useState<MeResponse | null>(null);
+
+  useEffect(() => {
+    getMe()
+      .then(setUser)
+      .catch(() => setUser(null));
+  }, []);
 
   return {
-    email,
+    email: user?.email_address ?? null,
     async signOut() {
       try {
         await apiSignOut();
       } finally {
-        clearUserEmail();
+        setUser(null);
         router.push("/login");
       }
     },
