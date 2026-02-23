@@ -117,6 +117,24 @@ paths:
           description: ログアウト成功
         '401':
           description: 未認証
+  "/api/v1/me":
+    get:
+      summary: 現在のユーザー情報を取得する
+      tags:
+      - Me
+      responses:
+        '200':
+          description: ユーザー情報
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MeResponse"
+        '401':
+          description: 未認証
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
   "/api/v1/todos":
     get:
       summary: Todo一覧を取得する
@@ -294,6 +312,17 @@ components:
           type: string
           format: email
       required:
+      - email_address
+    MeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        email_address:
+          type: string
+          format: email
+      required:
+      - id
       - email_address
     MessageResponse:
       type: object
