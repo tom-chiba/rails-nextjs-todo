@@ -14,12 +14,18 @@ function createRequest(
   return req;
 }
 
+function getRedirectPathname(res: Response): string {
+  const location = res.headers.get("location");
+  if (!location) throw new Error("No location header found");
+  return new URL(location).pathname;
+}
+
 describe("middleware", () => {
   describe("未認証ユーザー", () => {
     it("保護対象パスから /login にリダイレクトされる", () => {
       const res = middleware(createRequest("/"));
       expect(res.status).toBe(307);
-      expect(new URL(res.headers.get("location")!).pathname).toBe("/login");
+      expect(getRedirectPathname(res)).toBe("/login");
     });
 
     it("公開パス /login はそのまま通過する", () => {
@@ -54,13 +60,13 @@ describe("middleware", () => {
     it("公開パス /login から / にリダイレクトされる", () => {
       const res = middleware(createRequest("/login", session));
       expect(res.status).toBe(307);
-      expect(new URL(res.headers.get("location")!).pathname).toBe("/");
+      expect(getRedirectPathname(res)).toBe("/");
     });
 
     it("公開パス /register から / にリダイレクトされる", () => {
       const res = middleware(createRequest("/register", session));
       expect(res.status).toBe(307);
-      expect(new URL(res.headers.get("location")!).pathname).toBe("/");
+      expect(getRedirectPathname(res)).toBe("/");
     });
   });
 });
