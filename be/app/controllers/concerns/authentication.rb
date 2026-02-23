@@ -45,10 +45,11 @@ module Authentication
     end
 
     def session_cookie_options
+      options = { same_site: :lax }
       if (domain = ENV["SESSION_COOKIE_DOMAIN"])
-        { same_site: :lax, secure: true, domain: domain }
-      else
-        { same_site: :lax }
+        options[:domain] = domain
+        options[:secure] = true
       end
+      options
     end
 end
