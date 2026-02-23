@@ -40,6 +40,7 @@ env:
     SOLID_QUEUE_IN_PUMA: true
     HOST: rails-nextjs-todo.api.tom-chiba.com
     CORS_ORIGINS: "https://rails-nextjs-todo.tom-chiba.com"
+    SESSION_COOKIE_DOMAIN: ".tom-chiba.com"
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3

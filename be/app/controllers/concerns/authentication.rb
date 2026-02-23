@@ -45,8 +45,8 @@ module Authentication
     end
 
     def session_cookie_options
-      if Rails.env.production?
-        { same_site: :none, secure: true }
+      if (domain = ENV["SESSION_COOKIE_DOMAIN"])
+        { same_site: :lax, secure: true, domain: domain }
       else
         { same_site: :lax }
       end
