@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory :todo do
+    user
     text { "Buy milk" }
     completed { false }
 

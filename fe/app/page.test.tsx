@@ -5,6 +5,10 @@ import Home from "./page";
 
 let nextId = 1;
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
 vi.mock("./api/todos", () => ({
   getTodos: vi.fn(),
   createTodo: vi.fn(),
@@ -12,7 +16,13 @@ vi.mock("./api/todos", () => ({
   deleteTodo: vi.fn(),
 }));
 
+vi.mock("./api/auth", () => ({
+  getMe: vi.fn(),
+  signOut: vi.fn(),
+}));
+
 import * as todosApi from "./api/todos";
+import * as authApi from "./api/auth";
 
 vi.mock("motion/react", () => ({
   motion: {
@@ -47,6 +57,10 @@ vi.mock("next/dynamic", () => ({
 
 beforeEach(() => {
   nextId = 1;
+  (authApi.getMe as Mock).mockResolvedValue({
+    id: 1,
+    email_address: "test@example.com",
+  });
   (todosApi.getTodos as Mock).mockResolvedValue([]);
   (todosApi.createTodo as Mock).mockImplementation(async (text: string) => ({
     id: nextId++,

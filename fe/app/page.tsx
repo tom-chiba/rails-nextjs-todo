@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import * as todosApi from "./api/todos";
 import { TodoInput } from "./components/todo-input";
+import { useAuth } from "./hooks/use-auth";
 import type { Todo } from "./types";
 
 type FilterType = "all" | "active" | "completed";
@@ -23,6 +24,7 @@ const TodoFooter = dynamic(
 );
 
 export default function Home() {
+  const { email, loading: authLoading, signOut } = useAuth();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
   const [loading, setLoading] = useState(true);
@@ -80,9 +82,28 @@ export default function Home() {
     <div className="flex min-h-screen items-start justify-center px-6 py-16 sm:py-24">
       <div className="w-full max-w-lg">
         <header className="mb-14 animate-ink-drop">
-          <h1 className="font-display text-5xl tracking-tight text-ink-black sm:text-6xl">
-            Sumi
-          </h1>
+          <div className="flex items-start justify-between">
+            <h1 className="font-display text-5xl tracking-tight text-ink-black sm:text-6xl">
+              Sumi
+            </h1>
+            {!authLoading && email && (
+              <nav
+                aria-label="User menu"
+                className="flex items-center gap-3 pt-2"
+              >
+                <span className="hidden text-xs text-ink-light sm:inline">
+                  {email}
+                </span>
+                <button
+                  type="button"
+                  onClick={signOut}
+                  className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion"
+                >
+                  Log out
+                </button>
+              </nav>
+            )}
+          </div>
           <div className="mt-2 flex items-center gap-3">
             <div className="h-px flex-1 bg-gradient-to-r from-accent-vermillion/60 to-transparent animate-brush-reveal" />
             <span className="text-xs tracking-[0.3em] text-ink-faint uppercase">

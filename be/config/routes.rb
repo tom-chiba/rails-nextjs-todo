@@ -8,7 +8,15 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      namespace :auth do
+        post "sign_up", to: "registrations#create"
+        post "sign_in", to: "sessions#create"
+        delete "sign_out", to: "sessions#destroy"
+        resources :passwords, param: :token, only: %i[create update]
+      end
+
       resources :todos, only: [ :index, :create, :update, :destroy ]
+      get "me", to: "me#show"
     end
   end
 
