@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       end
 
       resources :todos, only: [ :index, :create, :update, :destroy ]
+      get "me", to: "me#show"
     end
   end
 
