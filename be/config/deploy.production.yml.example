@@ -1,0 +1,12 @@
+servers:
+  web:
+    - xxx.xxx.xxx.xxx
+
+proxy:
+  host: your-api.example.com
+
+env:
+  clear:
+    HOST: your-api.example.com
+    CORS_ORIGINS: "https://your-frontend.example.com"
+    SESSION_COOKIE_DOMAIN: ".example.com"
