@@ -1,7 +1,10 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type React from "react";
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 import Home from "./page";
+import type { Todo } from "./types";
 
 let nextId = 1;
 
@@ -9,20 +12,17 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
-vi.mock("./api/todos", () => ({
-  getTodos: vi.fn(),
-  createTodo: vi.fn(),
-  updateTodo: vi.fn(),
-  deleteTodo: vi.fn(),
+vi.mock("./generated/api-client/todoAPIV1", () => ({
+  useGetApiV1Me: vi.fn(),
+  useGetApiV1Todos: vi.fn(),
+  getGetApiV1TodosQueryKey: vi.fn(() => ["/api/v1/todos"]),
+  postApiV1Todos: vi.fn(),
+  patchApiV1TodosId: vi.fn(),
+  deleteApiV1TodosId: vi.fn(),
+  deleteApiV1AuthSignOut: vi.fn(),
 }));
 
-vi.mock("./api/auth", () => ({
-  getMe: vi.fn(),
-  signOut: vi.fn(),
-}));
-
-import * as todosApi from "./api/todos";
-import * as authApi from "./api/auth";
+import * as api from "./generated/api-client/todoAPIV1";
 
 vi.mock("motion/react", () => ({
   motion: {
@@ -55,42 +55,64 @@ vi.mock("next/dynamic", () => ({
   },
 }));
 
+function renderWithQueryClient(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
+  );
+}
+
 beforeEach(() => {
   nextId = 1;
-  (authApi.getMe as Mock).mockResolvedValue({
-    id: 1,
-    email_address: "test@example.com",
+  (api.useGetApiV1Me as Mock).mockReturnValue({
+    data: { id: 1, email_address: "test@example.com" },
+    isLoading: false,
   });
-  (todosApi.getTodos as Mock).mockResolvedValue([]);
-  (todosApi.createTodo as Mock).mockImplementation(async (text: string) => ({
-    id: nextId++,
-    text,
-    completed: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }));
-  (todosApi.updateTodo as Mock).mockImplementation(
-    async (id: number, attrs: Record<string, unknown>) => ({
-      id,
-      text: "Read a book",
-      completed: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      ...attrs,
+  (api.useGetApiV1Todos as Mock).mockReturnValue({
+    data: { data: [], status: 200 },
+    isLoading: false,
+  });
+  (api.postApiV1Todos as Mock).mockImplementation(
+    async (input: { todo: { text: string } }) => ({
+      data: {
+        id: nextId++,
+        text: input.todo.text,
+        completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } satisfies Todo,
+      status: 201,
     }),
   );
-  (todosApi.deleteTodo as Mock).mockResolvedValue(undefined);
+  (api.patchApiV1TodosId as Mock).mockImplementation(
+    async (id: number, input: { todo: Record<string, unknown> }) => ({
+      data: {
+        id,
+        text: "Read a book",
+        completed: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        ...input.todo,
+      },
+      status: 200,
+    }),
+  );
+  (api.deleteApiV1TodosId as Mock).mockResolvedValue(undefined);
 });
 
 describe("Home", () => {
   it("見出しが表示される", async () => {
     await vi.dynamicImportSettled?.();
-    render(<Home />);
+    renderWithQueryClient(<Home />);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Sumi");
   });
 
   it("空状態のメッセージが表示される", async () => {
-    render(<Home />);
+    renderWithQueryClient(<Home />);
     await waitFor(() => {
       expect(
         screen.getByText("Nothing here yet. Start writing."),
@@ -100,7 +122,7 @@ describe("Home", () => {
 
   it("Todoを追加できる", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderWithQueryClient(<Home />);
 
     await waitFor(() => {
       expect(screen.getByLabelText("New todo")).toBeDefined();
@@ -111,21 +133,31 @@ describe("Home", () => {
     await user.keyboard("{Enter}");
 
     await waitFor(() => {
-      expect(screen.getByText("Buy milk")).toBeDefined();
+      expect(api.postApiV1Todos).toHaveBeenCalledWith({
+        todo: { text: "Buy milk" },
+      });
     });
   });
 
   it("Todoを完了にできる", async () => {
-    const user = userEvent.setup();
-    render(<Home />);
-
-    await waitFor(() => {
-      expect(screen.getByLabelText("New todo")).toBeDefined();
+    (api.useGetApiV1Todos as Mock).mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 1,
+            text: "Read a book",
+            completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+        status: 200,
+      },
+      isLoading: false,
     });
 
-    const input = screen.getByLabelText("New todo");
-    await user.type(input, "Read a book");
-    await user.keyboard("{Enter}");
+    const user = userEvent.setup();
+    renderWithQueryClient(<Home />);
 
     await waitFor(() => {
       expect(screen.getByText("Read a book")).toBeDefined();
@@ -135,23 +167,31 @@ describe("Home", () => {
     await user.click(checkbox);
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText('Mark "Read a book" as incomplete'),
-      ).toBeDefined();
+      expect(api.patchApiV1TodosId).toHaveBeenCalledWith(1, {
+        todo: { completed: true },
+      });
     });
   });
 
   it("Todoを削除できる", async () => {
-    const user = userEvent.setup();
-    render(<Home />);
-
-    await waitFor(() => {
-      expect(screen.getByLabelText("New todo")).toBeDefined();
+    (api.useGetApiV1Todos as Mock).mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 1,
+            text: "Temporary task",
+            completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+        status: 200,
+      },
+      isLoading: false,
     });
 
-    const input = screen.getByLabelText("New todo");
-    await user.type(input, "Temporary task");
-    await user.keyboard("{Enter}");
+    const user = userEvent.setup();
+    renderWithQueryClient(<Home />);
 
     await waitFor(() => {
       expect(screen.getByText("Temporary task")).toBeDefined();
@@ -161,13 +201,13 @@ describe("Home", () => {
     await user.click(deleteBtn);
 
     await waitFor(() => {
-      expect(screen.queryByText("Temporary task")).toBeNull();
+      expect(api.deleteApiV1TodosId).toHaveBeenCalledWith(1);
     });
   });
 
   it("空文字のTodoは追加されない", async () => {
     const user = userEvent.setup();
-    render(<Home />);
+    renderWithQueryClient(<Home />);
 
     await waitFor(() => {
       expect(screen.getByLabelText("New todo")).toBeDefined();
