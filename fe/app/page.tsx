@@ -1,9 +1,16 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
-import * as todosApi from "./api/todos";
+import { useState } from "react";
 import { TodoInput } from "./components/todo-input";
+import {
+  deleteApiV1TodosId,
+  getGetApiV1TodosQueryKey,
+  patchApiV1TodosId,
+  postApiV1Todos,
+  useGetApiV1Todos,
+} from "./generated/api-client/todoAPIV1";
 import { useAuth } from "./hooks/use-auth";
 import type { Todo } from "./types";
 
@@ -25,50 +32,104 @@ const TodoFooter = dynamic(
 
 export default function Home() {
   const { email, loading: authLoading, signOut } = useAuth();
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const todosQueryKey = getGetApiV1TodosQueryKey();
 
-  useEffect(() => {
-    todosApi
-      .getTodos()
-      .then(setTodos)
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: todosResponse, isLoading: loading } = useGetApiV1Todos();
+  const todos = (todosResponse as { data: Todo[] } | undefined)?.data ?? [];
 
-  const addTodo = useCallback(async (text: string) => {
-    const todo = await todosApi.createTodo(text);
-    setTodos((prev) => [todo, ...prev]);
-  }, []);
+  async function addTodo(text: string) {
+    const res = await postApiV1Todos({ todo: { text } });
+    const newTodo = (res as { data: Todo }).data;
+    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
+      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
+      return { ...old, data: [newTodo, ...prev] };
+    });
+  }
 
-  const toggleTodo = useCallback(
-    async (id: number) => {
-      const target = todos.find((t) => t.id === id);
-      if (!target) return;
-      const newCompleted = !target.completed;
-      setTodos((prev) =>
-        prev.map((todo) =>
-          todo.id === id ? { ...todo, completed: newCompleted } : todo,
+  async function toggleTodo(id: number) {
+    const target = todos.find((t) => t.id === id);
+    if (!target) return;
+    const newCompleted = !target.completed;
+
+    // Optimistic update
+    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
+      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
+      return {
+        ...old,
+        data: prev.map((t) =>
+          t.id === id ? { ...t, completed: newCompleted } : t,
         ),
-      );
-      const updated = await todosApi.updateTodo(id, {
-        completed: newCompleted,
+      };
+    });
+
+    try {
+      const res = await patchApiV1TodosId(id, {
+        todo: { completed: newCompleted },
       });
-      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
-    },
-    [todos],
-  );
+      const updated = (res as { data: Todo }).data;
+      queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
+        const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
+        return {
+          ...old,
+          data: prev.map((t) => (t.id === id ? updated : t)),
+        };
+      });
+    } catch {
+      // Rollback
+      queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
+        const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
+        return {
+          ...old,
+          data: prev.map((t) =>
+            t.id === id ? { ...t, completed: !newCompleted } : t,
+          ),
+        };
+      });
+    }
+  }
 
-  const deleteTodo = useCallback(async (id: number) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-    await todosApi.deleteTodo(id);
-  }, []);
+  async function deleteTodo(id: number) {
+    const snapshot = todos;
 
-  const clearCompleted = useCallback(async () => {
+    // Optimistic update
+    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
+      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
+      return { ...old, data: prev.filter((t) => t.id !== id) };
+    });
+
+    try {
+      await deleteApiV1TodosId(id);
+    } catch {
+      // Rollback
+      queryClient.setQueryData(todosQueryKey, () => ({
+        ...todosResponse,
+        data: snapshot,
+      }));
+    }
+  }
+
+  async function clearCompleted() {
     const completedTodos = todos.filter((t) => t.completed);
-    setTodos((prev) => prev.filter((todo) => !todo.completed));
-    await Promise.all(completedTodos.map((t) => todosApi.deleteTodo(t.id)));
-  }, [todos]);
+    const snapshot = todos;
+
+    // Optimistic update
+    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
+      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
+      return { ...old, data: prev.filter((t) => !t.completed) };
+    });
+
+    try {
+      await Promise.all(completedTodos.map((t) => deleteApiV1TodosId(t.id)));
+    } catch {
+      // Rollback
+      queryClient.setQueryData(todosQueryKey, () => ({
+        ...todosResponse,
+        data: snapshot,
+      }));
+    }
+  }
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
