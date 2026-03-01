@@ -184,6 +184,22 @@ paths:
           application/json:
             schema:
               "$ref": "#/components/schemas/TodoInput"
+  "/api/v1/todos/bulk_destroy":
+    delete:
+      summary: Todoを一括削除する
+      tags:
+      - Todos
+      parameters: []
+      responses:
+        '204':
+          description: 一括削除成功
+        '401':
+          description: 未認証
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/BulkDeleteInput"
   "/api/v1/todos/{id}":
     parameters:
     - name: id
@@ -339,6 +355,15 @@ components:
           type: string
       required:
       - message
+    BulkDeleteInput:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - ids
     Error:
       type: object
       properties:

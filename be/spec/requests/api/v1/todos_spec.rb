@@ -84,6 +84,30 @@ RSpec.describe "Api::V1::Todos" do
       end
     end
 
+    describe "DELETE /api/v1/todos/bulk_destroy" do
+      it "destroys all specified todos" do
+        todos = create_list(:todo, 3, user: user)
+
+        expect {
+          delete bulk_destroy_api_v1_todos_path, params: { ids: todos.map(&:id) }, as: :json
+        }.to change(Todo, :count).by(-3)
+
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "does not destroy other user's todos" do
+        own_todo = create(:todo, user: user)
+        other_todo = create(:todo, user: create(:user))
+
+        expect {
+          delete bulk_destroy_api_v1_todos_path, params: { ids: [ own_todo.id, other_todo.id ] }, as: :json
+        }.to change(Todo, :count).by(-1)
+
+        expect(response).to have_http_status(:no_content)
+        expect(Todo.exists?(other_todo.id)).to be true
+      end
+    end
+
     describe "DELETE /api/v1/todos/:id" do
       it "destroys the todo" do
         todo = create(:todo, user: user)
@@ -127,6 +151,11 @@ RSpec.describe "Api::V1::Todos" do
     it "returns unauthorized for destroy" do
       todo = create(:todo)
       delete api_v1_todo_path(todo), as: :json
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "returns unauthorized for bulk_destroy" do
+      delete bulk_destroy_api_v1_todos_path, params: { ids: [ 1 ] }, as: :json
       expect(response).to have_http_status(:unauthorized)
     end
   end

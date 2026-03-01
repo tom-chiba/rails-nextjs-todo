@@ -26,6 +26,7 @@ import type {
 import type {
   AuthInput,
   AuthResponse,
+  BulkDeleteInput,
   Error,
   Errors,
   MeResponse,
@@ -822,6 +823,96 @@ export const usePostApiV1Todos = <TError = Error | Errors,
         TContext
       > => {
       return useMutation(getPostApiV1TodosMutationOptions(options), queryClient);
+    }
+    
+/**
+ * @summary Todoを一括削除する
+ */
+export type deleteApiV1TodosBulkDestroyResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteApiV1TodosBulkDestroyResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deleteApiV1TodosBulkDestroyResponseSuccess = (deleteApiV1TodosBulkDestroyResponse204) & {
+  headers: Headers;
+};
+export type deleteApiV1TodosBulkDestroyResponseError = (deleteApiV1TodosBulkDestroyResponse401) & {
+  headers: Headers;
+};
+
+export type deleteApiV1TodosBulkDestroyResponse = (deleteApiV1TodosBulkDestroyResponseSuccess | deleteApiV1TodosBulkDestroyResponseError)
+
+export const getDeleteApiV1TodosBulkDestroyUrl = () => {
+
+
+  
+
+  return `/api/v1/todos/bulk_destroy`
+}
+
+export const deleteApiV1TodosBulkDestroy = async (bulkDeleteInput: BulkDeleteInput, options?: RequestInit): Promise<deleteApiV1TodosBulkDestroyResponse> => {
+  
+  return customFetch<deleteApiV1TodosBulkDestroyResponse>(getDeleteApiV1TodosBulkDestroyUrl(),
+  {      
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      bulkDeleteInput,)
+  }
+);}
+  
+
+
+
+export const getDeleteApiV1TodosBulkDestroyMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1TodosBulkDestroy>>, TError,{data: BulkDeleteInput}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1TodosBulkDestroy>>, TError,{data: BulkDeleteInput}, TContext> => {
+
+const mutationKey = ['deleteApiV1TodosBulkDestroy'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiV1TodosBulkDestroy>>, {data: BulkDeleteInput}> = (props) => {
+          const {data} = props ?? {};
+
+          return  deleteApiV1TodosBulkDestroy(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiV1TodosBulkDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiV1TodosBulkDestroy>>>
+    export type DeleteApiV1TodosBulkDestroyMutationBody = BulkDeleteInput
+    export type DeleteApiV1TodosBulkDestroyMutationError = void
+
+    /**
+ * @summary Todoを一括削除する
+ */
+export const useDeleteApiV1TodosBulkDestroy = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1TodosBulkDestroy>>, TError,{data: BulkDeleteInput}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiV1TodosBulkDestroy>>,
+        TError,
+        {data: BulkDeleteInput},
+        TContext
+      > => {
+      return useMutation(getDeleteApiV1TodosBulkDestroyMutationOptions(options), queryClient);
     }
     
 /**

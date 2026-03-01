@@ -66,6 +66,28 @@ RSpec.describe "Api::V1::Todos", type: :request do
     end
   end
 
+  path "/api/v1/todos/bulk_destroy" do
+    delete "Todoを一括削除する" do
+      tags "Todos"
+      consumes "application/json"
+      parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/BulkDeleteInput" }
+
+      response "204", "一括削除成功" do
+        let(:params) { { ids: create_list(:todo, 3, user: user).map(&:id) } }
+
+        run_test!
+      end
+
+      response "401", "未認証" do
+        schema "$ref" => "#/components/schemas/Error"
+        let(:authenticate) { nil }
+        let(:params) { { ids: [ 1, 2, 3 ] } }
+
+        run_test!
+      end
+    end
+  end
+
   path "/api/v1/todos/{id}" do
     parameter name: :id, in: :path, type: :integer, description: "Todo ID"
 

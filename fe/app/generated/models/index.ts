@@ -7,6 +7,7 @@
 
 export * from './authInput';
 export * from './authResponse';
+export * from './bulkDeleteInput';
 export * from './error';
 export * from './errors';
 export * from './errorsErrors';
