@@ -36,6 +36,7 @@ RSpec.describe "Api::V1::Todos", type: :request do
       parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/TodoInput" }
 
       response "201", "作成成功" do
+        schema "$ref" => "#/components/schemas/Todo"
         let(:params) { { todo: { text: "New todo" } } }
 
         run_test! do |response|
@@ -75,6 +76,7 @@ RSpec.describe "Api::V1::Todos", type: :request do
       parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/TodoInput" }
 
       response "200", "更新成功" do
+        schema "$ref" => "#/components/schemas/Todo"
         let(:todo) { create(:todo, user: user) }
         let(:id) { todo.id }
         let(:params) { { todo: { completed: true } } }
