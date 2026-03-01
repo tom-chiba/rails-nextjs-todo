@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { FormErrors } from "../../components/form-errors";
-import { putApiV1AuthPasswordsToken } from "../../generated/api-client/todoAPIV1";
-import { AuthApiError } from "../../lib/api-client";
+import { usePutApiV1AuthPasswordsToken } from "../../generated/api-client/todoAPIV1";
+import { ApiError } from "../../lib/api-client";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -14,7 +14,19 @@ function ResetPasswordForm() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [submitting, setSubmitting] = useState(false);
+
+  const resetPassword = usePutApiV1AuthPasswordsToken({
+    mutation: {
+      onSuccess: () => setSuccess(true),
+      onError: (err) => {
+        if (err instanceof ApiError) {
+          setErrors(err.errors);
+        } else {
+          setErrors(["An unexpected error occurred"]);
+        }
+      },
+    },
+  });
 
   if (!token) {
     return (
@@ -35,7 +47,7 @@ function ResetPasswordForm() {
     );
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!token) return;
     setErrors([]);
@@ -45,23 +57,13 @@ function ResetPasswordForm() {
       return;
     }
 
-    setSubmitting(true);
-
-    try {
-      await putApiV1AuthPasswordsToken(token, {
+    resetPassword.mutate({
+      token,
+      data: {
         password,
         password_confirmation: passwordConfirmation,
-      });
-      setSuccess(true);
-    } catch (err) {
-      if (err instanceof AuthApiError) {
-        setErrors(err.errors);
-      } else {
-        setErrors(["An unexpected error occurred"]);
-      }
-    } finally {
-      setSubmitting(false);
-    }
+      },
+    });
   }
 
   if (success) {
@@ -128,8 +130,12 @@ function ResetPasswordForm() {
           />
         </div>
 
-        <button type="submit" disabled={submitting} className="ink-button">
-          {submitting ? "Resetting..." : "Reset password"}
+        <button
+          type="submit"
+          disabled={resetPassword.isPending}
+          className="ink-button"
+        >
+          {resetPassword.isPending ? "Resetting..." : "Reset password"}
         </button>
       </form>
     </div>

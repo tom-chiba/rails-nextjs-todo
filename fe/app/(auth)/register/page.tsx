@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormErrors } from "../../components/form-errors";
-import { postApiV1AuthSignUp } from "../../generated/api-client/todoAPIV1";
-import { AuthApiError } from "../../lib/api-client";
+import { usePostApiV1AuthSignUp } from "../../generated/api-client/todoAPIV1";
+import { ApiError } from "../../lib/api-client";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,9 +13,21 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
-  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const signUp = usePostApiV1AuthSignUp({
+    mutation: {
+      onSuccess: () => router.push("/"),
+      onError: (err) => {
+        if (err instanceof ApiError) {
+          setErrors(err.errors);
+        } else {
+          setErrors(["An unexpected error occurred"]);
+        }
+      },
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors([]);
 
@@ -24,24 +36,13 @@ export default function RegisterPage() {
       return;
     }
 
-    setSubmitting(true);
-
-    try {
-      await postApiV1AuthSignUp({
+    signUp.mutate({
+      data: {
         email_address: email,
         password,
         password_confirmation: passwordConfirmation,
-      });
-      router.push("/");
-    } catch (err) {
-      if (err instanceof AuthApiError) {
-        setErrors(err.errors);
-      } else {
-        setErrors(["An unexpected error occurred"]);
-      }
-    } finally {
-      setSubmitting(false);
-    }
+      },
+    });
   }
 
   return (
@@ -103,8 +104,12 @@ export default function RegisterPage() {
           />
         </div>
 
-        <button type="submit" disabled={submitting} className="ink-button">
-          {submitting ? "Creating account..." : "Create account"}
+        <button
+          type="submit"
+          disabled={signUp.isPending}
+          className="ink-button"
+        >
+          {signUp.isPending ? "Creating account..." : "Create account"}
         </button>
       </form>
 

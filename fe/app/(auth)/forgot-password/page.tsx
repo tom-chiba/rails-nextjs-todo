@@ -3,32 +3,31 @@
 import Link from "next/link";
 import { useState } from "react";
 import { FormErrors } from "../../components/form-errors";
-import { postApiV1AuthPasswords } from "../../generated/api-client/todoAPIV1";
-import { AuthApiError } from "../../lib/api-client";
+import { usePostApiV1AuthPasswords } from "../../generated/api-client/todoAPIV1";
+import { ApiError } from "../../lib/api-client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const requestReset = usePostApiV1AuthPasswords({
+    mutation: {
+      onSuccess: () => setSubmitted(true),
+      onError: (err) => {
+        if (err instanceof ApiError) {
+          setErrors(err.errors);
+        } else {
+          setErrors(["An unexpected error occurred"]);
+        }
+      },
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors([]);
-    setSubmitting(true);
-
-    try {
-      await postApiV1AuthPasswords({ email_address: email });
-      setSubmitted(true);
-    } catch (err) {
-      if (err instanceof AuthApiError) {
-        setErrors(err.errors);
-      } else {
-        setErrors(["An unexpected error occurred"]);
-      }
-    } finally {
-      setSubmitting(false);
-    }
+    requestReset.mutate({ data: { email_address: email } });
   }
 
   if (submitted) {
@@ -79,8 +78,12 @@ export default function ForgotPasswordPage() {
           />
         </div>
 
-        <button type="submit" disabled={submitting} className="ink-button">
-          {submitting ? "Sending..." : "Send reset link"}
+        <button
+          type="submit"
+          disabled={requestReset.isPending}
+          className="ink-button"
+        >
+          {requestReset.isPending ? "Sending..." : "Send reset link"}
         </button>
       </form>
 

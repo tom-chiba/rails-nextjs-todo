@@ -4,33 +4,32 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormErrors } from "../../components/form-errors";
-import { postApiV1AuthSignIn } from "../../generated/api-client/todoAPIV1";
-import { AuthApiError } from "../../lib/api-client";
+import { usePostApiV1AuthSignIn } from "../../generated/api-client/todoAPIV1";
+import { ApiError } from "../../lib/api-client";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
-  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const signIn = usePostApiV1AuthSignIn({
+    mutation: {
+      onSuccess: () => router.push("/"),
+      onError: (err) => {
+        if (err instanceof ApiError) {
+          setErrors(err.errors);
+        } else {
+          setErrors(["An unexpected error occurred"]);
+        }
+      },
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrors([]);
-    setSubmitting(true);
-
-    try {
-      await postApiV1AuthSignIn({ email_address: email, password });
-      router.push("/");
-    } catch (err) {
-      if (err instanceof AuthApiError) {
-        setErrors(err.errors);
-      } else {
-        setErrors(["An unexpected error occurred"]);
-      }
-    } finally {
-      setSubmitting(false);
-    }
+    signIn.mutate({ data: { email_address: email, password } });
   }
 
   return (
@@ -74,8 +73,12 @@ export default function LoginPage() {
           />
         </div>
 
-        <button type="submit" disabled={submitting} className="ink-button">
-          {submitting ? "Logging in..." : "Log in"}
+        <button
+          type="submit"
+          disabled={signIn.isPending}
+          className="ink-button"
+        >
+          {signIn.isPending ? "Logging in..." : "Log in"}
         </button>
       </form>
 
