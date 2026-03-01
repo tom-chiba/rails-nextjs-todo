@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthApiError, signIn } from "../../api/auth";
 import { FormErrors } from "../../components/form-errors";
+import { postApiV1AuthSignIn } from "../../generated/api-client/todoAPIV1";
+import { AuthApiError } from "../../lib/api-client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function LoginPage() {
     setSubmitting(true);
 
     try {
-      await signIn({ email_address: email, password });
+      await postApiV1AuthSignIn({ email_address: email, password });
       router.push("/");
     } catch (err) {
       if (err instanceof AuthApiError) {

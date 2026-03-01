@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AuthApiError, requestPasswordReset } from "../../api/auth";
 import { FormErrors } from "../../components/form-errors";
+import { postApiV1AuthPasswords } from "../../generated/api-client/todoAPIV1";
+import { AuthApiError } from "../../lib/api-client";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -17,7 +18,7 @@ export default function ForgotPasswordPage() {
     setSubmitting(true);
 
     try {
-      await requestPasswordReset({ email_address: email });
+      await postApiV1AuthPasswords({ email_address: email });
       setSubmitted(true);
     } catch (err) {
       if (err instanceof AuthApiError) {

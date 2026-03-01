@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { AuthApiError, resetPassword } from "../../api/auth";
 import { FormErrors } from "../../components/form-errors";
+import { putApiV1AuthPasswordsToken } from "../../generated/api-client/todoAPIV1";
+import { AuthApiError } from "../../lib/api-client";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -47,7 +48,7 @@ function ResetPasswordForm() {
     setSubmitting(true);
 
     try {
-      await resetPassword(token, {
+      await putApiV1AuthPasswordsToken(token, {
         password,
         password_confirmation: passwordConfirmation,
       });

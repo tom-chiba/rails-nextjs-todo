@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthApiError, signUp } from "../../api/auth";
 import { FormErrors } from "../../components/form-errors";
+import { postApiV1AuthSignUp } from "../../generated/api-client/todoAPIV1";
+import { AuthApiError } from "../../lib/api-client";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function RegisterPage() {
     setSubmitting(true);
 
     try {
-      await signUp({
+      await postApiV1AuthSignUp({
         email_address: email,
         password,
         password_confirmation: passwordConfirmation,
