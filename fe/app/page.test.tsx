@@ -73,7 +73,7 @@ beforeEach(() => {
     isLoading: false,
   });
   (api.useGetApiV1Todos as Mock).mockReturnValue({
-    data: { data: [], status: 200 },
+    data: [],
     isLoading: false,
   });
   (api.postApiV1Todos as Mock).mockImplementation(
@@ -141,18 +141,15 @@ describe("Home", () => {
 
   it("Todoを完了にできる", async () => {
     (api.useGetApiV1Todos as Mock).mockReturnValue({
-      data: {
-        data: [
-          {
-            id: 1,
-            text: "Read a book",
-            completed: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ],
-        status: 200,
-      },
+      data: [
+        {
+          id: 1,
+          text: "Read a book",
+          completed: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ],
       isLoading: false,
     });
 
@@ -175,18 +172,15 @@ describe("Home", () => {
 
   it("Todoを削除できる", async () => {
     (api.useGetApiV1Todos as Mock).mockReturnValue({
-      data: {
-        data: [
-          {
-            id: 1,
-            text: "Temporary task",
-            completed: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ],
-        status: 200,
-      },
+      data: [
+        {
+          id: 1,
+          text: "Temporary task",
+          completed: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ],
       isLoading: false,
     });
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { TodoInput } from "./components/todo-input";
+import type { getApiV1TodosResponse } from "./generated/api-client/todoAPIV1";
 import {
   deleteApiV1TodosId,
   getGetApiV1TodosQueryKey,
@@ -36,100 +37,108 @@ export default function Home() {
   const queryClient = useQueryClient();
   const todosQueryKey = getGetApiV1TodosQueryKey();
 
-  const { data: todosResponse, isLoading: loading } = useGetApiV1Todos();
-  const todos = (todosResponse as { data: Todo[] } | undefined)?.data ?? [];
+  const { data: todos = [], isLoading: loading } = useGetApiV1Todos({
+    query: {
+      select: (res) => (res as { data: Todo[] }).data,
+    },
+  });
 
-  async function addTodo(text: string) {
-    const res = await postApiV1Todos({ todo: { text } });
-    const newTodo = (res as { data: Todo }).data;
-    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
-      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
-      return { ...old, data: [newTodo, ...prev] };
-    });
-  }
+  const addMutation = useMutation({
+    mutationFn: (text: string) => postApiV1Todos({ todo: { text } }),
+    onSuccess: (res) => {
+      const newTodo = (res as { data: Todo }).data;
+      queryClient.setQueryData(
+        todosQueryKey,
+        (old: getApiV1TodosResponse | undefined) => {
+          const prev = old ? (old as { data: Todo[] }).data : [];
+          return { ...old, data: [newTodo, ...prev] };
+        },
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: todosQueryKey });
+    },
+  });
 
-  async function toggleTodo(id: number) {
-    const target = todos.find((t) => t.id === id);
-    if (!target) return;
-    const newCompleted = !target.completed;
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, completed }: { id: number; completed: boolean }) =>
+      patchApiV1TodosId(id, { todo: { completed } }),
+    onMutate: async ({ id, completed }) => {
+      await queryClient.cancelQueries({ queryKey: todosQueryKey });
+      const previous =
+        queryClient.getQueryData<getApiV1TodosResponse>(todosQueryKey);
+      queryClient.setQueryData(
+        todosQueryKey,
+        (old: getApiV1TodosResponse | undefined) => {
+          const prev = old ? (old as { data: Todo[] }).data : [];
+          return {
+            ...old,
+            data: prev.map((t) => (t.id === id ? { ...t, completed } : t)),
+          };
+        },
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(todosQueryKey, context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: todosQueryKey });
+    },
+  });
 
-    // Optimistic update
-    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
-      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
-      return {
-        ...old,
-        data: prev.map((t) =>
-          t.id === id ? { ...t, completed: newCompleted } : t,
-        ),
-      };
-    });
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteApiV1TodosId(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: todosQueryKey });
+      const previous =
+        queryClient.getQueryData<getApiV1TodosResponse>(todosQueryKey);
+      queryClient.setQueryData(
+        todosQueryKey,
+        (old: getApiV1TodosResponse | undefined) => {
+          const prev = old ? (old as { data: Todo[] }).data : [];
+          return { ...old, data: prev.filter((t) => t.id !== id) };
+        },
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(todosQueryKey, context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: todosQueryKey });
+    },
+  });
 
-    try {
-      const res = await patchApiV1TodosId(id, {
-        todo: { completed: newCompleted },
-      });
-      const updated = (res as { data: Todo }).data;
-      queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
-        const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
-        return {
-          ...old,
-          data: prev.map((t) => (t.id === id ? updated : t)),
-        };
-      });
-    } catch {
-      // Rollback
-      queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
-        const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
-        return {
-          ...old,
-          data: prev.map((t) =>
-            t.id === id ? { ...t, completed: !newCompleted } : t,
-          ),
-        };
-      });
-    }
-  }
-
-  async function deleteTodo(id: number) {
-    const snapshot = todos;
-
-    // Optimistic update
-    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
-      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
-      return { ...old, data: prev.filter((t) => t.id !== id) };
-    });
-
-    try {
-      await deleteApiV1TodosId(id);
-    } catch {
-      // Rollback
-      queryClient.setQueryData(todosQueryKey, () => ({
-        ...todosResponse,
-        data: snapshot,
-      }));
-    }
-  }
-
-  async function clearCompleted() {
-    const completedTodos = todos.filter((t) => t.completed);
-    const snapshot = todos;
-
-    // Optimistic update
-    queryClient.setQueryData(todosQueryKey, (old: typeof todosResponse) => {
-      const prev = (old as { data: Todo[] } | undefined)?.data ?? [];
-      return { ...old, data: prev.filter((t) => !t.completed) };
-    });
-
-    try {
-      await Promise.all(completedTodos.map((t) => deleteApiV1TodosId(t.id)));
-    } catch {
-      // Rollback
-      queryClient.setQueryData(todosQueryKey, () => ({
-        ...todosResponse,
-        data: snapshot,
-      }));
-    }
-  }
+  const clearCompletedMutation = useMutation({
+    mutationFn: (completedIds: number[]) =>
+      Promise.all(completedIds.map((id) => deleteApiV1TodosId(id))),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: todosQueryKey });
+      const previous =
+        queryClient.getQueryData<getApiV1TodosResponse>(todosQueryKey);
+      queryClient.setQueryData(
+        todosQueryKey,
+        (old: getApiV1TodosResponse | undefined) => {
+          const prev = old ? (old as { data: Todo[] }).data : [];
+          return { ...old, data: prev.filter((t) => !t.completed) };
+        },
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(todosQueryKey, context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: todosQueryKey });
+    },
+  });
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -174,7 +183,7 @@ export default function Home() {
         </header>
 
         <main id="main-content">
-          <TodoInput onAdd={addTodo} />
+          <TodoInput onAdd={(text) => addMutation.mutate(text)} />
 
           <h2 className="sr-only">Todo list</h2>
           {loading ? (
@@ -184,8 +193,15 @@ export default function Home() {
           ) : (
             <TodoList
               todos={filteredTodos}
-              onToggle={toggleTodo}
-              onDelete={deleteTodo}
+              onToggle={(id) => {
+                const target = todos.find((t) => t.id === id);
+                if (target)
+                  toggleMutation.mutate({
+                    id,
+                    completed: !target.completed,
+                  });
+              }}
+              onDelete={(id) => deleteMutation.mutate(id)}
             />
           )}
         </main>
@@ -194,7 +210,11 @@ export default function Home() {
           todos={todos}
           filter={filter}
           onFilterChange={setFilter}
-          onClearCompleted={clearCompleted}
+          onClearCompleted={() =>
+            clearCompletedMutation.mutate(
+              todos.filter((t) => t.completed).map((t) => t.id),
+            )
+          }
         />
       </div>
     </div>
