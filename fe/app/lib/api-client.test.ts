@@ -36,7 +36,7 @@ describe("customFetch", () => {
       customFetch("/api/v1/todos", { method: "GET" }),
     ).rejects.toThrow(
       expect.objectContaining({
-        name: "AuthApiError",
+        name: "ApiError",
         status: 401,
         errors: ["Authentication required"],
       }),
@@ -54,7 +54,7 @@ describe("customFetch", () => {
       customFetch("/api/v1/todos", { method: "POST" }),
     ).rejects.toThrow(
       expect.objectContaining({
-        name: "AuthApiError",
+        name: "ApiError",
         status: 422,
         errors: ["Name can't be blank"],
       }),

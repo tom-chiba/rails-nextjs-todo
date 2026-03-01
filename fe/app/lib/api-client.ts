@@ -1,13 +1,13 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
-export class AuthApiError extends Error {
+export class ApiError extends Error {
   constructor(
     public status: number,
     public errors: string[],
   ) {
     super(errors.join(", "));
-    this.name = "AuthApiError";
+    this.name = "ApiError";
   }
 }
 
@@ -29,10 +29,10 @@ export async function customFetch<TData>(
 
   const body = await res.json().catch(() => ({}));
   if ("errors" in body && Array.isArray(body.errors)) {
-    throw new AuthApiError(res.status, body.errors);
+    throw new ApiError(res.status, body.errors);
   }
   if ("error" in body) {
-    throw new AuthApiError(res.status, [body.error]);
+    throw new ApiError(res.status, [body.error]);
   }
-  throw new AuthApiError(res.status, ["An unexpected error occurred"]);
+  throw new ApiError(res.status, ["An unexpected error occurred"]);
 }
