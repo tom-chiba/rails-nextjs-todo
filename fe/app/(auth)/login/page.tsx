@@ -15,6 +15,7 @@ export default function LoginPage() {
 
   const signIn = usePostApiV1AuthSignIn({
     mutation: {
+      meta: { skipRedirectOn401: true },
       onSuccess: () => router.push("/"),
       onError: (err) => {
         if (err instanceof ApiError) {

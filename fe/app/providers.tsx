@@ -33,7 +33,9 @@ function makeQueryClient() {
       },
     }),
     mutationCache: new MutationCache({
-      onError: (error) => handle401(error),
+      onError: (error, _variables, _context, mutation) => {
+        if (!mutation.meta?.skipRedirectOn401) handle401(error);
+      },
     }),
   });
 }

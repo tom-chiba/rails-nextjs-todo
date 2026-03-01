@@ -6,7 +6,7 @@ import {
   deleteApiV1AuthSignOut,
   useGetApiV1Me,
 } from "../generated/api-client/todoAPIV1";
-import type { MeResponse } from "../types";
+import { selectData } from "../lib/api-client";
 
 export function useAuth() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export function useAuth() {
   const { data: user, isLoading } = useGetApiV1Me({
     query: {
       meta: { skipRedirectOn401: true },
-      select: (res) => (res as { data: MeResponse }).data,
+      select: selectData,
     },
   });
 

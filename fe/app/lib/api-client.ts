@@ -11,6 +11,26 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Orval が生成する union response 型から success variant の data 型を抽出する。
+ * customFetch がエラー時に throw するため、select/onSuccess には常に success variant が渡される。
+ */
+export type SuccessData<T> = Extract<T, { status: 200 | 201 | 204 }> extends {
+  data: infer D;
+}
+  ? D
+  : never;
+
+/**
+ * Orval response から success data を取得する。
+ * 散在する `as` キャストを一箇所に集約する。
+ */
+export function selectData<T extends { status: number; data: unknown }>(
+  res: T,
+): SuccessData<T> {
+  return (res as { data: SuccessData<T> }).data;
+}
+
 export async function customFetch<TData>(
   url: string,
   options?: RequestInit,

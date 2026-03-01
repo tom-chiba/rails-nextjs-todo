@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { TodoInput } from "./components/todo-input";
-import type { getApiV1TodosResponse } from "./generated/api-client/todoAPIV1";
+import type { getApiV1TodosResponseSuccess } from "./generated/api-client/todoAPIV1";
 import {
   deleteApiV1TodosId,
   getGetApiV1TodosQueryKey,
@@ -13,7 +13,7 @@ import {
   useGetApiV1Todos,
 } from "./generated/api-client/todoAPIV1";
 import { useAuth } from "./hooks/use-auth";
-import type { Todo } from "./types";
+import { selectData } from "./lib/api-client";
 
 type FilterType = "all" | "active" | "completed";
 
@@ -39,19 +39,19 @@ export default function Home() {
 
   const { data: todos = [], isLoading: loading } = useGetApiV1Todos({
     query: {
-      select: (res) => (res as { data: Todo[] }).data,
+      select: selectData,
     },
   });
 
   const addMutation = useMutation({
     mutationFn: (text: string) => postApiV1Todos({ todo: { text } }),
     onSuccess: (res) => {
-      const newTodo = (res as { data: Todo }).data;
-      queryClient.setQueryData(
+      const newTodo = selectData(res);
+      queryClient.setQueryData<getApiV1TodosResponseSuccess>(
         todosQueryKey,
-        (old: getApiV1TodosResponse | undefined) => {
-          const prev = old ? (old as { data: Todo[] }).data : [];
-          return { ...old, data: [newTodo, ...prev] };
+        (old) => {
+          if (!old) return old;
+          return { ...old, data: [newTodo, ...selectData(old)] };
         },
       );
     },
@@ -66,14 +66,16 @@ export default function Home() {
     onMutate: async ({ id, completed }) => {
       await queryClient.cancelQueries({ queryKey: todosQueryKey });
       const previous =
-        queryClient.getQueryData<getApiV1TodosResponse>(todosQueryKey);
-      queryClient.setQueryData(
+        queryClient.getQueryData<getApiV1TodosResponseSuccess>(todosQueryKey);
+      queryClient.setQueryData<getApiV1TodosResponseSuccess>(
         todosQueryKey,
-        (old: getApiV1TodosResponse | undefined) => {
-          const prev = old ? (old as { data: Todo[] }).data : [];
+        (old) => {
+          if (!old) return old;
           return {
             ...old,
-            data: prev.map((t) => (t.id === id ? { ...t, completed } : t)),
+            data: selectData(old).map((t) =>
+              t.id === id ? { ...t, completed } : t,
+            ),
           };
         },
       );
@@ -94,12 +96,12 @@ export default function Home() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: todosQueryKey });
       const previous =
-        queryClient.getQueryData<getApiV1TodosResponse>(todosQueryKey);
-      queryClient.setQueryData(
+        queryClient.getQueryData<getApiV1TodosResponseSuccess>(todosQueryKey);
+      queryClient.setQueryData<getApiV1TodosResponseSuccess>(
         todosQueryKey,
-        (old: getApiV1TodosResponse | undefined) => {
-          const prev = old ? (old as { data: Todo[] }).data : [];
-          return { ...old, data: prev.filter((t) => t.id !== id) };
+        (old) => {
+          if (!old) return old;
+          return { ...old, data: selectData(old).filter((t) => t.id !== id) };
         },
       );
       return { previous };
@@ -120,12 +122,15 @@ export default function Home() {
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: todosQueryKey });
       const previous =
-        queryClient.getQueryData<getApiV1TodosResponse>(todosQueryKey);
-      queryClient.setQueryData(
+        queryClient.getQueryData<getApiV1TodosResponseSuccess>(todosQueryKey);
+      queryClient.setQueryData<getApiV1TodosResponseSuccess>(
         todosQueryKey,
-        (old: getApiV1TodosResponse | undefined) => {
-          const prev = old ? (old as { data: Todo[] }).data : [];
-          return { ...old, data: prev.filter((t) => !t.completed) };
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            data: selectData(old).filter((t) => !t.completed),
+          };
         },
       );
       return { previous };
