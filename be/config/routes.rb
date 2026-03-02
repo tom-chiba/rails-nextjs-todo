@@ -15,7 +15,9 @@ Rails.application.routes.draw do
         resources :passwords, param: :token, only: %i[create update]
       end
 
-      resources :todos, only: [ :index, :create, :update, :destroy ]
+      resources :todos, only: [ :index, :create, :update, :destroy ] do
+        delete :bulk_destroy, on: :collection
+      end
       get "me", to: "me#show"
     end
   end

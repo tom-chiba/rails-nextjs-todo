@@ -1,34 +1,31 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getMe, signOut as apiSignOut } from "../api/auth";
-import type { MeResponse } from "../types";
+import {
+  deleteApiV1AuthSignOut,
+  useGetApiV1Me,
+} from "../generated/api-client/todoAPIV1";
+import { selectData } from "../lib/api-client";
 
-// TODO: useAuth() は呼び出しごとに独立して getMe() を実行するため、
-// 複数コンポーネントで使用すると N 回 API コールが発生する。
-// 使用箇所が増えた場合は React Context または SWR で重複排除すること。
-// See: https://github.com/tom-chiba/rails-nextjs-todo/issues/59
 export function useAuth() {
   const router = useRouter();
-  const [user, setUser] = useState<MeResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getMe()
-      .then(setUser)
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
+  const queryClient = useQueryClient();
+  const { data: user, isLoading } = useGetApiV1Me({
+    query: {
+      meta: { skipRedirectOn401: true },
+      select: selectData,
+    },
+  });
 
   return {
     email: user?.email_address ?? null,
-    loading,
+    loading: isLoading,
     async signOut() {
       try {
-        await apiSignOut();
+        await deleteApiV1AuthSignOut();
       } finally {
-        setUser(null);
+        queryClient.clear();
         router.push("/login");
       }
     },

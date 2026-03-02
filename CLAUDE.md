@@ -64,7 +64,7 @@ npm run test:watch                 # テスト監視モード (開発中)
 npm run lint                       # Biomeチェック (lint)
 npm run format                     # Biomeフォーマット (自動修正)
 npm run typecheck                  # TypeScript型チェック (tsc --noEmit)
-npm run generate:types             # OpenAPIスキーマからTypeScript型を自動生成
+npm run generate:api               # OpenAPIスキーマからAPI hooks・関数・型を自動生成 (Orval)
 ```
 
 ## バックエンド注意事項
@@ -93,7 +93,9 @@ npm run generate:types             # OpenAPIスキーマからTypeScript型を�
 - **パスエイリアス**: `@/*` はプロジェクトルート (`./`) にマッピング
 - **TypeScript**: strictモード有効
 - **API通信**: CORS 直接通信方式。FE からBE に直接リクエストを送信。BE の URL は環境変数 `NEXT_PUBLIC_API_BASE_URL`（デフォルト: `http://localhost:3000`）で指定
-- **API型自動生成**: `openapi-typescript` で BE の swagger.yaml から `app/generated/api.ts` を生成。`app/types.ts` が再エクスポートするファサード。API スキーマ変更時は `npm run generate:types` を実行
+- **データ取得**: TanStack Query (`@tanstack/react-query`) でキャッシュ・重複排除・楽観的更新を管理。`app/providers.tsx` で QueryClientProvider を配置
+- **API自動生成**: Orval で BE の swagger.yaml から TanStack Query hooks・API 関数・TypeScript 型を自動生成。設定は `fe/orval.config.ts`。生成先: `app/generated/api-client/` (hooks・関数) + `app/generated/models/` (型)。`app/types.ts` が models を再エクスポートするファサード。API スキーマ変更時は `npm run generate:api` を実行
+- **カスタム fetch**: `app/lib/api-client.ts` の `customFetch` が全 API リクエストの基盤。`credentials: "include"`, ベース URL 解決, エラーパース (`AuthApiError`) を担当。401 リダイレクトは QueryCache.onError で一元管理
 - **デプロイ**: Vercel。`NEXT_PUBLIC_API_BASE_URL` 環境変数で BE の本番 URL (`https://rails-nextjs-todo.api.tom-chiba.com`) を指定
 
 ## CI (GitHub Actions)

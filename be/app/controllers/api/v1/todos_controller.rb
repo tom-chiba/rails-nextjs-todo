@@ -31,6 +31,12 @@ module Api
         head :no_content
       end
 
+      def bulk_destroy
+        ids = params.expect(ids: [])
+        Current.user.todos.where(id: ids).destroy_all
+        head :no_content
+      end
+
       private
 
       def set_todo

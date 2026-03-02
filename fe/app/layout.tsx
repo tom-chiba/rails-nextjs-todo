@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, Zen_Kaku_Gothic_New } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 const dmSerif = DM_Serif_Display({
   variable: "--font-dm-serif",
@@ -33,7 +34,7 @@ export default function RootLayout({
         >
           <span lang="ja">メインコンテンツへスキップ</span>
         </a>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

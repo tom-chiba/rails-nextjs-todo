@@ -1,11 +1,18 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
-import * as todosApi from "./api/todos";
+import { useState } from "react";
 import { TodoInput } from "./components/todo-input";
+import {
+  deleteApiV1TodosBulkDestroy,
+  deleteApiV1TodosId,
+  patchApiV1TodosId,
+  postApiV1Todos,
+  useGetApiV1Todos,
+} from "./generated/api-client/todoAPIV1";
 import { useAuth } from "./hooks/use-auth";
-import type { Todo } from "./types";
+import { useTodosMutation } from "./hooks/use-todos-mutation";
+import { selectData } from "./lib/api-client";
 
 type FilterType = "all" | "active" | "completed";
 
@@ -25,50 +32,54 @@ const TodoFooter = dynamic(
 
 export default function Home() {
   const { email, loading: authLoading, signOut } = useAuth();
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>("all");
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    todosApi
-      .getTodos()
-      .then(setTodos)
-      .finally(() => setLoading(false));
-  }, []);
-
-  const addTodo = useCallback(async (text: string) => {
-    const todo = await todosApi.createTodo(text);
-    setTodos((prev) => [todo, ...prev]);
-  }, []);
-
-  const toggleTodo = useCallback(
-    async (id: number) => {
-      const target = todos.find((t) => t.id === id);
-      if (!target) return;
-      const newCompleted = !target.completed;
-      setTodos((prev) =>
-        prev.map((todo) =>
-          todo.id === id ? { ...todo, completed: newCompleted } : todo,
-        ),
-      );
-      const updated = await todosApi.updateTodo(id, {
-        completed: newCompleted,
-      });
-      setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
+  const {
+    data: todos = [],
+    isLoading: loading,
+    isError,
+  } = useGetApiV1Todos({
+    query: {
+      select: selectData,
     },
-    [todos],
-  );
+  });
 
-  const deleteTodo = useCallback(async (id: number) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-    await todosApi.deleteTodo(id);
-  }, []);
+  const addMutation = useTodosMutation({
+    mutationFn: (text: string) => postApiV1Todos({ todo: { text } }),
+    updater: (text, todos) => [
+      {
+        id: -Date.now(),
+        text,
+        completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      ...todos,
+    ],
+  });
 
-  const clearCompleted = useCallback(async () => {
-    const completedTodos = todos.filter((t) => t.completed);
-    setTodos((prev) => prev.filter((todo) => !todo.completed));
-    await Promise.all(completedTodos.map((t) => todosApi.deleteTodo(t.id)));
-  }, [todos]);
+  const toggleMutation = useTodosMutation({
+    mutationFn: ({ id, completed }: { id: number; completed: boolean }) =>
+      patchApiV1TodosId(id, { todo: { completed } }),
+    updater: ({ id, completed }, todos) =>
+      todos.map((t) => (t.id === id ? { ...t, completed } : t)),
+  });
+
+  const deleteMutation = useTodosMutation({
+    mutationFn: (id: number) => deleteApiV1TodosId(id),
+    updater: (id, todos) => todos.filter((t) => t.id !== id),
+  });
+
+  const clearCompletedMutation = useTodosMutation({
+    mutationFn: (ids: number[]) => deleteApiV1TodosBulkDestroy({ ids }),
+    updater: (_ids, todos) => todos.filter((t) => !t.completed),
+  });
+
+  const mutationError =
+    addMutation.isError ||
+    toggleMutation.isError ||
+    deleteMutation.isError ||
+    clearCompletedMutation.isError;
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -113,28 +124,54 @@ export default function Home() {
         </header>
 
         <main id="main-content">
-          <TodoInput onAdd={addTodo} />
+          <TodoInput onAdd={(text) => addMutation.mutate(text)} />
+
+          {mutationError && (
+            <p
+              role="alert"
+              className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
+            >
+              Something went wrong. Please try again.
+            </p>
+          )}
 
           <h2 className="sr-only">Todo list</h2>
           {loading ? (
             <div className="flex justify-center py-20 animate-fade-in">
               <p className="text-ink-light text-sm tracking-wide">Loading...</p>
             </div>
+          ) : isError ? (
+            <div className="flex justify-center py-20 animate-fade-in">
+              <p className="text-ink-medium text-sm tracking-wide">
+                Failed to load todos.
+              </p>
+            </div>
           ) : (
-            <TodoList
-              todos={filteredTodos}
-              onToggle={toggleTodo}
-              onDelete={deleteTodo}
-            />
+            <>
+              <TodoList
+                todos={filteredTodos}
+                onToggle={(id) => {
+                  const target = todos.find((t) => t.id === id);
+                  if (target)
+                    toggleMutation.mutate({
+                      id,
+                      completed: !target.completed,
+                    });
+                }}
+                onDelete={(id) => deleteMutation.mutate(id)}
+              />
+              <TodoFooter
+                todos={todos}
+                filter={filter}
+                onFilterChange={setFilter}
+                onClearCompleted={() => {
+                  const ids = todos.filter((t) => t.completed).map((t) => t.id);
+                  if (ids.length > 0) clearCompletedMutation.mutate(ids);
+                }}
+              />
+            </>
           )}
         </main>
-
-        <TodoFooter
-          todos={todos}
-          filter={filter}
-          onFilterChange={setFilter}
-          onClearCompleted={clearCompleted}
-        />
       </div>
     </div>
   );

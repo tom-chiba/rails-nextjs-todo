@@ -94,6 +94,13 @@ RSpec.configure do |config|
             },
             required: %w[message]
           },
+          BulkDeleteInput: {
+            type: :object,
+            properties: {
+              ids: { type: :array, items: { type: :integer } }
+            },
+            required: %w[ids]
+          },
           Error: {
             type: :object,
             properties: {
