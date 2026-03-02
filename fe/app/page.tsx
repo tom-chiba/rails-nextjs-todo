@@ -157,11 +157,12 @@ export default function Home() {
                 todos={todos}
                 filter={filter}
                 onFilterChange={setFilter}
-                onClearCompleted={() =>
-                  clearCompletedMutation.mutate(
-                    todos.filter((t) => t.completed).map((t) => t.id),
-                  )
-                }
+                onClearCompleted={() => {
+                  const ids = todos
+                    .filter((t) => t.completed)
+                    .map((t) => t.id);
+                  if (ids.length > 0) clearCompletedMutation.mutate(ids);
+                }}
               />
             </>
           )}
