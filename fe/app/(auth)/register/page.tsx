@@ -16,6 +16,7 @@ export default function RegisterPage() {
 
   const signUp = usePostApiV1AuthSignUp({
     mutation: {
+      meta: { skipRedirectOn401: true },
       onSuccess: () => router.push("/"),
       onError: (err) => {
         if (err instanceof ApiError) {
