@@ -1,14 +1,11 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { TodoInput } from "./components/todo-input";
-import type { getApiV1TodosResponseSuccess } from "./generated/api-client/todoAPIV1";
 import {
   deleteApiV1TodosBulkDestroy,
   deleteApiV1TodosId,
-  getGetApiV1TodosQueryKey,
   patchApiV1TodosId,
   postApiV1Todos,
   useGetApiV1Todos,
@@ -36,8 +33,6 @@ const TodoFooter = dynamic(
 export default function Home() {
   const { email, loading: authLoading, signOut } = useAuth();
   const [filter, setFilter] = useState<FilterType>("all");
-  const queryClient = useQueryClient();
-  const todosQueryKey = getGetApiV1TodosQueryKey();
 
   const {
     data: todos = [],
@@ -49,21 +44,18 @@ export default function Home() {
     },
   });
 
-  const addMutation = useMutation({
+  const addMutation = useTodosMutation({
     mutationFn: (text: string) => postApiV1Todos({ todo: { text } }),
-    onSuccess: (res) => {
-      const newTodo = selectData(res);
-      queryClient.setQueryData<getApiV1TodosResponseSuccess>(
-        todosQueryKey,
-        (old) => {
-          if (!old) return old;
-          return { ...old, data: [newTodo, ...selectData(old)] };
-        },
-      );
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: todosQueryKey });
-    },
+    updater: (text, todos) => [
+      {
+        id: -Date.now(),
+        text,
+        completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      ...todos,
+    ],
   });
 
   const toggleMutation = useTodosMutation({
@@ -82,6 +74,12 @@ export default function Home() {
     mutationFn: (ids: number[]) => deleteApiV1TodosBulkDestroy({ ids }),
     updater: (_ids, todos) => todos.filter((t) => !t.completed),
   });
+
+  const mutationError =
+    addMutation.isError ||
+    toggleMutation.isError ||
+    deleteMutation.isError ||
+    clearCompletedMutation.isError;
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -128,6 +126,15 @@ export default function Home() {
         <main id="main-content">
           <TodoInput onAdd={(text) => addMutation.mutate(text)} />
 
+          {mutationError && (
+            <p
+              role="alert"
+              className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
+            >
+              Something went wrong. Please try again.
+            </p>
+          )}
+
           <h2 className="sr-only">Todo list</h2>
           {loading ? (
             <div className="flex justify-center py-20 animate-fade-in">
@@ -158,9 +165,7 @@ export default function Home() {
                 filter={filter}
                 onFilterChange={setFilter}
                 onClearCompleted={() => {
-                  const ids = todos
-                    .filter((t) => t.completed)
-                    .map((t) => t.id);
+                  const ids = todos.filter((t) => t.completed).map((t) => t.id);
                   if (ids.length > 0) clearCompletedMutation.mutate(ids);
                 }}
               />
