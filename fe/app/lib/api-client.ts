@@ -35,7 +35,10 @@ export async function customFetch<TData>(
   url: string,
   options?: RequestInit,
 ): Promise<TData> {
-  const fullUrl = url.startsWith("http") ? url : `${API_BASE}${url}`;
+  const fullUrl =
+    url.startsWith("http://") || url.startsWith("https://")
+      ? url
+      : `${API_BASE}${url}`;
 
   const res = await fetch(fullUrl, {
     ...options,
@@ -47,11 +50,11 @@ export async function customFetch<TData>(
     return res.json();
   }
 
-  const body = await res.json().catch(() => ({}));
-  if ("errors" in body && Array.isArray(body.errors)) {
-    throw new ApiError(res.status, body.errors);
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (Array.isArray(body.errors)) {
+    throw new ApiError(res.status, body.errors as string[]);
   }
-  if ("error" in body) {
+  if (typeof body.error === "string") {
     throw new ApiError(res.status, [body.error]);
   }
   throw new ApiError(res.status, ["An unexpected error occurred"]);
