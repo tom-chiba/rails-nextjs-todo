@@ -39,7 +39,11 @@ export default function Home() {
   const queryClient = useQueryClient();
   const todosQueryKey = getGetApiV1TodosQueryKey();
 
-  const { data: todos = [], isLoading: loading } = useGetApiV1Todos({
+  const {
+    data: todos = [],
+    isLoading: loading,
+    isError,
+  } = useGetApiV1Todos({
     query: {
       select: selectData,
     },
@@ -129,32 +133,39 @@ export default function Home() {
             <div className="flex justify-center py-20 animate-fade-in">
               <p className="text-ink-light text-sm tracking-wide">Loading...</p>
             </div>
+          ) : isError ? (
+            <div className="flex justify-center py-20 animate-fade-in">
+              <p className="text-ink-medium text-sm tracking-wide">
+                Failed to load todos.
+              </p>
+            </div>
           ) : (
-            <TodoList
-              todos={filteredTodos}
-              onToggle={(id) => {
-                const target = todos.find((t) => t.id === id);
-                if (target)
-                  toggleMutation.mutate({
-                    id,
-                    completed: !target.completed,
-                  });
-              }}
-              onDelete={(id) => deleteMutation.mutate(id)}
-            />
+            <>
+              <TodoList
+                todos={filteredTodos}
+                onToggle={(id) => {
+                  const target = todos.find((t) => t.id === id);
+                  if (target)
+                    toggleMutation.mutate({
+                      id,
+                      completed: !target.completed,
+                    });
+                }}
+                onDelete={(id) => deleteMutation.mutate(id)}
+              />
+              <TodoFooter
+                todos={todos}
+                filter={filter}
+                onFilterChange={setFilter}
+                onClearCompleted={() =>
+                  clearCompletedMutation.mutate(
+                    todos.filter((t) => t.completed).map((t) => t.id),
+                  )
+                }
+              />
+            </>
           )}
         </main>
-
-        <TodoFooter
-          todos={todos}
-          filter={filter}
-          onFilterChange={setFilter}
-          onClearCompleted={() =>
-            clearCompletedMutation.mutate(
-              todos.filter((t) => t.completed).map((t) => t.id),
-            )
-          }
-        />
       </div>
     </div>
   );
