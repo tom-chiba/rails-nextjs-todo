@@ -19,6 +19,7 @@ vi.mock("./generated/api-client/todoAPIV1", () => ({
   postApiV1Todos: vi.fn(),
   patchApiV1TodosId: vi.fn(),
   deleteApiV1TodosId: vi.fn(),
+  deleteApiV1TodosBulkDestroy: vi.fn(),
   deleteApiV1AuthSignOut: vi.fn(),
 }));
 
@@ -102,6 +103,7 @@ beforeEach(() => {
     }),
   );
   (api.deleteApiV1TodosId as Mock).mockResolvedValue(undefined);
+  (api.deleteApiV1TodosBulkDestroy as Mock).mockResolvedValue(undefined);
 });
 
 describe("Home", () => {
@@ -196,6 +198,172 @@ describe("Home", () => {
 
     await waitFor(() => {
       expect(api.deleteApiV1TodosId).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe("フィルター", () => {
+    const mixedTodos = [
+      {
+        id: 1,
+        text: "Active task",
+        completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        text: "Done task",
+        completed: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+
+    it("Active フィルターで未完了のTodoのみ表示される", async () => {
+      (api.useGetApiV1Todos as Mock).mockReturnValue({
+        data: mixedTodos,
+        isLoading: false,
+      });
+
+      const user = userEvent.setup();
+      renderWithQueryClient(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Active task")).toBeDefined();
+        expect(screen.getByText("Done task")).toBeDefined();
+      });
+
+      await user.click(screen.getByRole("button", { name: "Active" }));
+
+      await waitFor(() => {
+        expect(screen.getByText("Active task")).toBeDefined();
+        expect(screen.queryByText("Done task")).toBeNull();
+      });
+    });
+
+    it("Done フィルターで完了済みのTodoのみ表示される", async () => {
+      (api.useGetApiV1Todos as Mock).mockReturnValue({
+        data: mixedTodos,
+        isLoading: false,
+      });
+
+      const user = userEvent.setup();
+      renderWithQueryClient(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Active task")).toBeDefined();
+      });
+
+      await user.click(screen.getByRole("button", { name: "Done" }));
+
+      await waitFor(() => {
+        expect(screen.queryByText("Active task")).toBeNull();
+        expect(screen.getByText("Done task")).toBeDefined();
+      });
+    });
+
+    it("All フィルターで全てのTodoが表示される", async () => {
+      (api.useGetApiV1Todos as Mock).mockReturnValue({
+        data: mixedTodos,
+        isLoading: false,
+      });
+
+      const user = userEvent.setup();
+      renderWithQueryClient(<Home />);
+
+      // まず Active に切り替え
+      await waitFor(() => {
+        expect(screen.getByText("Active task")).toBeDefined();
+      });
+      await user.click(screen.getByRole("button", { name: "Active" }));
+      await waitFor(() => {
+        expect(screen.queryByText("Done task")).toBeNull();
+      });
+
+      // All に戻す
+      await user.click(screen.getByRole("button", { name: "All" }));
+      await waitFor(() => {
+        expect(screen.getByText("Active task")).toBeDefined();
+        expect(screen.getByText("Done task")).toBeDefined();
+      });
+    });
+  });
+
+  describe("Clear done", () => {
+    it("完了済みTodoを一括削除する", async () => {
+      (api.useGetApiV1Todos as Mock).mockReturnValue({
+        data: [
+          {
+            id: 1,
+            text: "Active task",
+            completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 2,
+            text: "Done task",
+            completed: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+        isLoading: false,
+      });
+
+      const user = userEvent.setup();
+      renderWithQueryClient(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Clear done")).toBeDefined();
+      });
+
+      await user.click(screen.getByText("Clear done"));
+
+      await waitFor(() => {
+        expect(api.deleteApiV1TodosBulkDestroy).toHaveBeenCalledWith({
+          ids: [2],
+        });
+      });
+    });
+
+    it("完了済みTodoがなければClear doneボタンが表示されない", async () => {
+      (api.useGetApiV1Todos as Mock).mockReturnValue({
+        data: [
+          {
+            id: 1,
+            text: "Active only",
+            completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ],
+        isLoading: false,
+      });
+
+      renderWithQueryClient(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Active only")).toBeDefined();
+      });
+
+      expect(screen.queryByText("Clear done")).toBeNull();
+    });
+  });
+
+  describe("エラー表示", () => {
+    it("クエリエラー時に失敗メッセージが表示される", async () => {
+      (api.useGetApiV1Todos as Mock).mockReturnValue({
+        data: [],
+        isLoading: false,
+        isError: true,
+      });
+
+      renderWithQueryClient(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Failed to load todos.")).toBeDefined();
+      });
     });
   });
 

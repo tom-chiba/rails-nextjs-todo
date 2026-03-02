@@ -106,6 +106,29 @@ RSpec.describe "Api::V1::Todos" do
         expect(response).to have_http_status(:no_content)
         expect(Todo.exists?(other_todo.id)).to be true
       end
+
+      it "returns bad request for empty ids array" do
+        create(:todo, user: user)
+
+        expect {
+          delete bulk_destroy_api_v1_todos_path, params: { ids: [] }, as: :json
+        }.not_to change(Todo, :count)
+
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it "handles nonexistent ids gracefully" do
+        expect {
+          delete bulk_destroy_api_v1_todos_path, params: { ids: [ 999_999, 999_998 ] }, as: :json
+        }.not_to change(Todo, :count)
+
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "returns bad request when ids parameter is missing" do
+        delete bulk_destroy_api_v1_todos_path, as: :json
+        expect(response).to have_http_status(:bad_request)
+      end
     end
 
     describe "DELETE /api/v1/todos/:id" do
