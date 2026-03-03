@@ -80,4 +80,54 @@ RSpec.describe "Api::V1::Auth::Registrations" do
       end
     end
   end
+
+  describe "DELETE /api/v1/auth/account" do
+    context "when authenticated" do
+      let(:user) { create(:user) }
+
+      before do
+        sign_in(user)
+        create_list(:todo, 2, user: user)
+      end
+
+      it "returns no_content" do
+        delete api_v1_auth_account_path
+
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "destroys the user" do
+        expect {
+          delete api_v1_auth_account_path
+        }.to change(User, :count).by(-1)
+      end
+
+      it "destroys user's todos" do
+        expect {
+          delete api_v1_auth_account_path
+        }.to change(Todo, :count).by(-2)
+      end
+
+      it "destroys user's sessions" do
+        expect {
+          delete api_v1_auth_account_path
+        }.to change(Session, :count).by(-1)
+      end
+
+      it "clears the session cookie" do
+        delete api_v1_auth_account_path
+
+        expect(cookies[:session_id]).to be_blank
+      end
+    end
+
+    context "when not authenticated" do
+      it "returns unauthorized" do
+        delete api_v1_auth_account_path
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(response.parsed_body["error"]).to eq("Authentication required")
+      end
+    end
+  end
 end

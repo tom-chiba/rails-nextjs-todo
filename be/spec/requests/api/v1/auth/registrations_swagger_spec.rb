@@ -29,4 +29,20 @@ RSpec.describe "Api::V1::Auth::Registrations", type: :request do
       end
     end
   end
+
+  path "/api/v1/auth/account" do
+    delete "アカウント削除" do
+      tags "Auth"
+
+      response "204", "アカウント削除成功" do
+        before { sign_in }
+        run_test!
+      end
+
+      response "401", "未認証" do
+        schema "$ref" => "#/components/schemas/Error"
+        run_test!
+      end
+    end
+  end
 end
