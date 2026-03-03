@@ -1,5 +1,5 @@
 ---
-status: "accepted"
+status: "superseded by [ADR-0020](0020-tanstack-query-orval-data-fetching.md)"
 date: 2026-02-08
 decision-makers: []
 ---
