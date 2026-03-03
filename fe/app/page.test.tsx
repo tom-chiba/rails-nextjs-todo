@@ -21,6 +21,7 @@ vi.mock("./generated/api-client/todoAPIV1", () => ({
   deleteApiV1TodosId: vi.fn(),
   deleteApiV1TodosBulkDestroy: vi.fn(),
   deleteApiV1AuthSignOut: vi.fn(),
+  deleteApiV1AuthAccount: vi.fn(),
 }));
 
 import * as api from "./generated/api-client/todoAPIV1";
@@ -364,6 +365,42 @@ describe("Home", () => {
       await waitFor(() => {
         expect(screen.getByText("Failed to load todos.")).toBeDefined();
       });
+    });
+  });
+
+  describe("Delete account", () => {
+    it("確認OKでAPIが呼ばれる", async () => {
+      vi.spyOn(window, "confirm").mockReturnValue(true);
+      (api.deleteApiV1AuthAccount as Mock).mockResolvedValue(undefined);
+
+      const user = userEvent.setup();
+      renderWithQueryClient(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Delete account")).toBeDefined();
+      });
+
+      await user.click(screen.getByText("Delete account"));
+
+      await waitFor(() => {
+        expect(api.deleteApiV1AuthAccount).toHaveBeenCalled();
+      });
+    });
+
+    it("確認キャンセルでAPIは呼ばれない", async () => {
+      vi.spyOn(window, "confirm").mockReturnValue(false);
+      (api.deleteApiV1AuthAccount as Mock).mockClear();
+
+      const user = userEvent.setup();
+      renderWithQueryClient(<Home />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Delete account")).toBeDefined();
+      });
+
+      await user.click(screen.getByText("Delete account"));
+
+      expect(api.deleteApiV1AuthAccount).not.toHaveBeenCalled();
     });
   });
 

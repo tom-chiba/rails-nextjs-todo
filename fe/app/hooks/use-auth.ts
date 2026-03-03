@@ -3,6 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
+  deleteApiV1AuthAccount,
   deleteApiV1AuthSignOut,
   useGetApiV1Me,
 } from "../generated/api-client/todoAPIV1";
@@ -24,6 +25,14 @@ export function useAuth() {
     async signOut() {
       try {
         await deleteApiV1AuthSignOut();
+      } finally {
+        queryClient.clear();
+        router.push("/login");
+      }
+    },
+    async deleteAccount() {
+      try {
+        await deleteApiV1AuthAccount();
       } finally {
         queryClient.clear();
         router.push("/login");

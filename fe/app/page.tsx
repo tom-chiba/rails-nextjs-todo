@@ -31,7 +31,7 @@ const TodoFooter = dynamic(
 );
 
 export default function Home() {
-  const { email, loading: authLoading, signOut } = useAuth();
+  const { email, loading: authLoading, signOut, deleteAccount } = useAuth();
   const [filter, setFilter] = useState<FilterType>("all");
 
   const {
@@ -111,6 +111,21 @@ export default function Home() {
                   className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion"
                 >
                   Log out
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure? This will permanently delete your account and all data.",
+                      )
+                    ) {
+                      deleteAccount();
+                    }
+                  }}
+                  className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion"
+                >
+                  Delete account
                 </button>
               </nav>
             )}
