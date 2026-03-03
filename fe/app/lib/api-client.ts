@@ -46,8 +46,13 @@ export async function customFetch<TData>(
   });
 
   if (res.ok) {
-    if (res.status === 204) return undefined as TData;
-    return res.json();
+    if (res.status === 204)
+      return { data: undefined, status: 204, headers: res.headers } as TData;
+    return {
+      data: await res.json(),
+      status: res.status,
+      headers: res.headers,
+    } as TData;
   }
 
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
