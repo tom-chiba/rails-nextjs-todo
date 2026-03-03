@@ -13,6 +13,12 @@ class Api::V1::Auth::RegistrationsController < ApplicationController
     end
   end
 
+  def destroy
+    terminate_session
+    Current.user.destroy!
+    head :no_content
+  end
+
   private
 
   def user_params

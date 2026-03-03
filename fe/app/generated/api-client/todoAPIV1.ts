@@ -316,6 +316,95 @@ export const usePostApiV1AuthSignUp = <TError = ValidationErrors,
     }
     
 /**
+ * @summary アカウント削除
+ */
+export type deleteApiV1AuthAccountResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteApiV1AuthAccountResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deleteApiV1AuthAccountResponseSuccess = (deleteApiV1AuthAccountResponse204) & {
+  headers: Headers;
+};
+export type deleteApiV1AuthAccountResponseError = (deleteApiV1AuthAccountResponse401) & {
+  headers: Headers;
+};
+
+export type deleteApiV1AuthAccountResponse = (deleteApiV1AuthAccountResponseSuccess | deleteApiV1AuthAccountResponseError)
+
+export const getDeleteApiV1AuthAccountUrl = () => {
+
+
+  
+
+  return `/api/v1/auth/account`
+}
+
+export const deleteApiV1AuthAccount = async ( options?: RequestInit): Promise<deleteApiV1AuthAccountResponse> => {
+  
+  return customFetch<deleteApiV1AuthAccountResponse>(getDeleteApiV1AuthAccountUrl(),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getDeleteApiV1AuthAccountMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1AuthAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1AuthAccount>>, TError,void, TContext> => {
+
+const mutationKey = ['deleteApiV1AuthAccount'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiV1AuthAccount>>, void> = () => {
+          
+
+          return  deleteApiV1AuthAccount(requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiV1AuthAccountMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiV1AuthAccount>>>
+    
+    export type DeleteApiV1AuthAccountMutationError = void
+
+    /**
+ * @summary アカウント削除
+ */
+export const useDeleteApiV1AuthAccount = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1AuthAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiV1AuthAccount>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDeleteApiV1AuthAccountMutationOptions(options), queryClient);
+    }
+    
+/**
  * @summary ログイン
  */
 export type postApiV1AuthSignInResponse201 = {
