@@ -18,6 +18,7 @@ Rails.application.routes.draw do
 
       resources :todos, only: [ :index, :create, :update, :destroy ] do
         delete :bulk_destroy, on: :collection
+        resource :image, only: [ :create, :destroy ], controller: "todo_images"
       end
       get "me", to: "me#show"
     end

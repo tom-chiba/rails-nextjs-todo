@@ -145,6 +145,76 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Error"
+  "/api/v1/todos/{todo_id}/image":
+    parameters:
+    - name: todo_id
+      in: path
+      description: Todo ID
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Todoに画像をアップロードする
+      tags:
+      - Todo Images
+      parameters: []
+      responses:
+        '200':
+          description: アップロード成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Todo"
+        '422':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Errors"
+        '404':
+          description: Todo Not Found
+        '401':
+          description: 未認証
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)
+              required:
+              - image
+            examples:
+              image:
+                summary: Todoに画像をアップロードする
+                value:
+                  image: binary
+    delete:
+      summary: Todoの画像を削除する
+      tags:
+      - Todo Images
+      responses:
+        '200':
+          description: 削除成功
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Todo"
+        '404':
+          description: 画像なし or Todo Not Found
+        '401':
+          description: 未認証
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
   "/api/v1/todos":
     get:
       summary: Todo一覧を取得する
@@ -272,6 +342,9 @@ components:
           type: string
         completed:
           type: boolean
+        image_url:
+          type: string
+          nullable: true
         created_at:
           type: string
           format: date-time
@@ -282,6 +355,7 @@ components:
       - id
       - text
       - completed
+      - image_url
       - created_at
       - updated_at
     TodoInput:
