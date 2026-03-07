@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type TodoInputProps = {
   onAdd: (text: string, image?: File) => void;
@@ -16,6 +16,12 @@ export function TodoInput({ onAdd }: TodoInputProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -27,8 +33,10 @@ export function TodoInput({ onAdd }: TodoInputProps) {
 
     setError(null);
     setSelectedFile(file);
-    const url = URL.createObjectURL(file);
-    setPreview(url);
+    setPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   };
 
   const clearImage = () => {
@@ -39,7 +47,7 @@ export function TodoInput({ onAdd }: TodoInputProps) {
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const text = inputRef.current?.value.trim();
     if (!text) return;
