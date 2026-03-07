@@ -164,7 +164,10 @@ export default function Home() {
 
         <main id="main-content">
           <TodoInput
-            onAdd={(text, image) => addMutation.mutate({ text, image })}
+            onAdd={(text, image) => {
+              setImageUploadFailed(false);
+              addMutation.mutate({ text, image });
+            }}
           />
 
           {mutationError && (

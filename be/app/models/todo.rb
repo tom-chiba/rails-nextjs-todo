@@ -47,7 +47,12 @@ class Todo < ApplicationRecord
       io = attachable.respond_to?(:read) ? attachable : attachable[:io]
       [io, io.size]
     else
-      [StringIO.new(image.blob.download.first(4096)), image.byte_size]
+      io = StringIO.new
+      image.blob.open do |tempfile|
+        io.write(tempfile.read(4096))
+      end
+      io.rewind
+      [io, image.byte_size]
     end
   end
 end
