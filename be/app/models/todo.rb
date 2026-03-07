@@ -17,7 +17,7 @@ class Todo < ApplicationRecord
 
   def as_json(options = {})
     super(options.merge(
-      methods: Array(options[:methods]) | [:image_url]
+      methods: Array(options[:methods]) | [ :image_url ]
     ))
   end
 
@@ -45,14 +45,14 @@ class Todo < ApplicationRecord
     if change.is_a?(ActiveStorage::Attached::Changes::CreateOne)
       attachable = change.attachable
       io = attachable.respond_to?(:read) ? attachable : attachable[:io]
-      [io, io.size]
+      [ io, io.size ]
     else
       io = StringIO.new
       image.blob.open do |tempfile|
         io.write(tempfile.read(4096))
       end
       io.rewind
-      [io, image.byte_size]
+      [ io, image.byte_size ]
     end
   end
 end

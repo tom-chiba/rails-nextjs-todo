@@ -7,7 +7,7 @@ namespace :swagger do
       content = File.read(file_path)
       next unless content.include?("type: file")
 
-      yaml = YAML.safe_load(content, permitted_classes: [Symbol])
+      yaml = YAML.safe_load(content, permitted_classes: [ Symbol ])
       yaml["paths"]&.each_value do |path_item|
         path_item.each_value do |operation|
           next unless operation.is_a?(Hash) && operation["requestBody"]
@@ -21,7 +21,7 @@ namespace :swagger do
               "properties" => {
                 "image" => { "type" => "string", "format" => "binary" }
               },
-              "required" => ["image"]
+              "required" => [ "image" ]
             }
           end
         end
