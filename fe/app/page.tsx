@@ -36,6 +36,7 @@ const TodoFooter = dynamic(
 export default function Home() {
   const { email, loading: authLoading, signOut, deleteAccount } = useAuth();
   const [filter, setFilter] = useState<FilterType>("all");
+  const [imageUploadFailed, setImageUploadFailed] = useState(false);
 
   const {
     data: todos = [],
@@ -62,12 +63,13 @@ export default function Home() {
       ...todos,
     ],
     onSuccess: async (data, args) => {
+      setImageUploadFailed(false);
       if (args.image && "data" in data && data.data) {
         const todo = data.data as Todo;
         try {
           await postApiV1TodosTodoIdImage(todo.id, { image: args.image });
         } catch {
-          // Todo作成は成功済み。再フェッチで最新状態を取得
+          setImageUploadFailed(true);
         }
       }
     },
@@ -171,6 +173,15 @@ export default function Home() {
               className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
             >
               Something went wrong. Please try again.
+            </p>
+          )}
+
+          {imageUploadFailed && (
+            <p
+              role="alert"
+              className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
+            >
+              Todo was created, but the image failed to upload.
             </p>
           )}
 
