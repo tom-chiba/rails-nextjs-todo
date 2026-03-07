@@ -65,6 +65,10 @@ Rails 標準機能であり既にプロジェクトに設定済みのため、�
 - 関連: ADR-0022（画像 API エンドポイント設計）
 - 関連 Issue: #7
 
+### Content-Type 偽装防止
+
+画像バリデーションでは、クライアントから送信される `Content-Type` ヘッダーを信頼せず、`Marcel::MimeType.for` でファイル先頭 4096 バイトのマジックバイトを解析して実際の MIME タイプを判定している（`Todo#acceptable_image`）。これにより、拡張子や Content-Type を偽装した非画像ファイルのアップロードを防止する。Marcel は Active Storage の依存 gem として既に含まれているため、追加の依存は不要。
+
 ### 将来の拡張パス
 
 - **外部ストレージへの移行**: `config/storage.yml` に S3 / GCS サービスを追加し、`config/environments/production.rb` の `config.active_storage.service` を切り替えるだけで移行可能。アプリケーションコードの変更は不要
