@@ -66,7 +66,7 @@ RSpec.describe "Api::V1::TodoImages", type: :request do
 
         before do
           todo.image.attach(
-            io: StringIO.new("image data"),
+            io: StringIO.new("\xFF\xD8\xFF\xE0".b + ("\x00" * 100).b),
             filename: "test.jpg",
             content_type: "image/jpeg"
           )

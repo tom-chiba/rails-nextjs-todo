@@ -40,6 +40,8 @@ RSpec.describe Todo do
   end
 
   describe "image" do
+    let(:jpeg_header) { "\xFF\xD8\xFF\xE0".b + ("\x00" * 100).b }
+
     it "is valid without an image" do
       todo = build(:todo)
       expect(todo).to be_valid
@@ -48,7 +50,7 @@ RSpec.describe Todo do
     it "is valid with a JPEG image" do
       todo = create(:todo)
       todo.image.attach(
-        io: StringIO.new("fake image data"),
+        io: StringIO.new(jpeg_header),
         filename: "test.jpg",
         content_type: "image/jpeg"
       )
@@ -58,9 +60,20 @@ RSpec.describe Todo do
     it "is invalid with a non-image file" do
       todo = create(:todo)
       todo.image.attach(
-        io: StringIO.new("fake text data"),
+        io: StringIO.new("This is not an image"),
         filename: "test.txt",
         content_type: "text/plain"
+      )
+      expect(todo).not_to be_valid
+      expect(todo.errors[:image]).to include("must be a JPEG, PNG, GIF, or WebP")
+    end
+
+    it "rejects a file with spoofed content_type" do
+      todo = create(:todo)
+      todo.image.attach(
+        io: StringIO.new("This is not an image"),
+        filename: "evil.jpg",
+        content_type: "image/jpeg"
       )
       expect(todo).not_to be_valid
       expect(todo.errors[:image]).to include("must be a JPEG, PNG, GIF, or WebP")
@@ -69,7 +82,7 @@ RSpec.describe Todo do
     it "is invalid with an oversized image" do
       todo = create(:todo)
       todo.image.attach(
-        io: StringIO.new("x" * (5.megabytes + 1)),
+        io: StringIO.new(jpeg_header + ("x" * 5.megabytes).b),
         filename: "large.jpg",
         content_type: "image/jpeg"
       )
@@ -85,7 +98,7 @@ RSpec.describe Todo do
     it "returns image_url when image is attached" do
       todo = create(:todo)
       todo.image.attach(
-        io: StringIO.new("fake image data"),
+        io: StringIO.new(jpeg_header),
         filename: "test.jpg",
         content_type: "image/jpeg"
       )

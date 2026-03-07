@@ -26,13 +26,28 @@ class Todo < ApplicationRecord
   def acceptable_image
     return unless image.attached?
 
-    detected = Marcel::MimeType.for(image.blob.download, name: image.filename.to_s)
+    io, byte_size = image_io_and_size
+    io.rewind
+    detected = Marcel::MimeType.for(io.read(4096))
+    io.rewind
+
     unless detected.in?(ALLOWED_IMAGE_TYPES)
       errors.add(:image, "must be a JPEG, PNG, GIF, or WebP")
     end
 
-    if image.byte_size > MAX_IMAGE_SIZE
+    if byte_size > MAX_IMAGE_SIZE
       errors.add(:image, "is too large (maximum is 5MB)")
+    end
+  end
+
+  def image_io_and_size
+    change = attachment_changes["image"]
+    if change.is_a?(ActiveStorage::Attached::Changes::CreateOne)
+      attachable = change.attachable
+      io = attachable.respond_to?(:read) ? attachable : attachable[:io]
+      [io, io.size]
+    else
+      [StringIO.new(image.blob.download.first(4096)), image.byte_size]
     end
   end
 end

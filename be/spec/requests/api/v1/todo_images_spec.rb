@@ -28,7 +28,7 @@ RSpec.describe "Api::V1::TodoImages", type: :request do
 
     it "replaces an existing image" do
       todo.image.attach(
-        io: StringIO.new("old image"),
+        io: StringIO.new("\xFF\xD8\xFF\xE0".b + ("\x00" * 100).b),
         filename: "old.jpg",
         content_type: "image/jpeg"
       )
@@ -58,7 +58,7 @@ RSpec.describe "Api::V1::TodoImages", type: :request do
   describe "DELETE /api/v1/todos/:todo_id/image" do
     it "deletes the image from a todo" do
       todo.image.attach(
-        io: StringIO.new("image data"),
+        io: StringIO.new("\xFF\xD8\xFF\xE0".b + ("\x00" * 100).b),
         filename: "test.jpg",
         content_type: "image/jpeg"
       )
