@@ -8,9 +8,15 @@ type TodoListProps = {
   todos: Todo[];
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
+  onDeleteImage?: (id: number) => void;
 };
 
-export function TodoList({ todos, onToggle, onDelete }: TodoListProps) {
+export function TodoList({
+  todos,
+  onToggle,
+  onDelete,
+  onDeleteImage,
+}: TodoListProps) {
   if (todos.length === 0) {
     return <EmptyState />;
   }
@@ -24,6 +30,7 @@ export function TodoList({ todos, onToggle, onDelete }: TodoListProps) {
             todo={todo}
             onToggle={onToggle}
             onDelete={onDelete}
+            onDeleteImage={onDeleteImage}
           />
         ))}
       </AnimatePresence>

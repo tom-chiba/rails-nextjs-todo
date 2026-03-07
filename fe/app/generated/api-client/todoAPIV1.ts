@@ -33,6 +33,7 @@ import type {
   MessageResponse,
   PasswordResetInput,
   PasswordResetRequestInput,
+  PostApiV1TodosTodoIdImageBody,
   RegistrationInput,
   Todo,
   TodoInput,
@@ -701,6 +702,203 @@ export function useGetApiV1Me<TData = Awaited<ReturnType<typeof getApiV1Me>>, TE
 
 
 
+/**
+ * @summary Todoに画像をアップロードする
+ */
+export type postApiV1TodosTodoIdImageResponse200 = {
+  data: Todo
+  status: 200
+}
+
+export type postApiV1TodosTodoIdImageResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type postApiV1TodosTodoIdImageResponse404 = {
+  data: void
+  status: 404
+}
+
+export type postApiV1TodosTodoIdImageResponse422 = {
+  data: Errors
+  status: 422
+}
+
+export type postApiV1TodosTodoIdImageResponseSuccess = (postApiV1TodosTodoIdImageResponse200) & {
+  headers: Headers;
+};
+export type postApiV1TodosTodoIdImageResponseError = (postApiV1TodosTodoIdImageResponse401 | postApiV1TodosTodoIdImageResponse404 | postApiV1TodosTodoIdImageResponse422) & {
+  headers: Headers;
+};
+
+export type postApiV1TodosTodoIdImageResponse = (postApiV1TodosTodoIdImageResponseSuccess | postApiV1TodosTodoIdImageResponseError)
+
+export const getPostApiV1TodosTodoIdImageUrl = (todoId: number,) => {
+
+
+  
+
+  return `/api/v1/todos/${todoId}/image`
+}
+
+export const postApiV1TodosTodoIdImage = async (todoId: number,
+    postApiV1TodosTodoIdImageBody: PostApiV1TodosTodoIdImageBody, options?: RequestInit): Promise<postApiV1TodosTodoIdImageResponse> => {
+    const formData = new FormData();
+formData.append(`image`, postApiV1TodosTodoIdImageBody.image);
+
+  return customFetch<postApiV1TodosTodoIdImageResponse>(getPostApiV1TodosTodoIdImageUrl(todoId),
+  {      
+    ...options,
+    method: 'POST'
+    ,
+    body: 
+      formData,
+  }
+);}
+  
+
+
+
+export const getPostApiV1TodosTodoIdImageMutationOptions = <TError = Error | void | Errors,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TodosTodoIdImage>>, TError,{todoId: number;data: PostApiV1TodosTodoIdImageBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1TodosTodoIdImage>>, TError,{todoId: number;data: PostApiV1TodosTodoIdImageBody}, TContext> => {
+
+const mutationKey = ['postApiV1TodosTodoIdImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1TodosTodoIdImage>>, {todoId: number;data: PostApiV1TodosTodoIdImageBody}> = (props) => {
+          const {todoId,data} = props ?? {};
+
+          return  postApiV1TodosTodoIdImage(todoId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiV1TodosTodoIdImageMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1TodosTodoIdImage>>>
+    export type PostApiV1TodosTodoIdImageMutationBody = PostApiV1TodosTodoIdImageBody
+    export type PostApiV1TodosTodoIdImageMutationError = Error | void | Errors
+
+    /**
+ * @summary Todoに画像をアップロードする
+ */
+export const usePostApiV1TodosTodoIdImage = <TError = Error | void | Errors,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TodosTodoIdImage>>, TError,{todoId: number;data: PostApiV1TodosTodoIdImageBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiV1TodosTodoIdImage>>,
+        TError,
+        {todoId: number;data: PostApiV1TodosTodoIdImageBody},
+        TContext
+      > => {
+      return useMutation(getPostApiV1TodosTodoIdImageMutationOptions(options), queryClient);
+    }
+    
+/**
+ * @summary Todoの画像を削除する
+ */
+export type deleteApiV1TodosTodoIdImageResponse200 = {
+  data: Todo
+  status: 200
+}
+
+export type deleteApiV1TodosTodoIdImageResponse401 = {
+  data: Error
+  status: 401
+}
+
+export type deleteApiV1TodosTodoIdImageResponse404 = {
+  data: void
+  status: 404
+}
+
+export type deleteApiV1TodosTodoIdImageResponseSuccess = (deleteApiV1TodosTodoIdImageResponse200) & {
+  headers: Headers;
+};
+export type deleteApiV1TodosTodoIdImageResponseError = (deleteApiV1TodosTodoIdImageResponse401 | deleteApiV1TodosTodoIdImageResponse404) & {
+  headers: Headers;
+};
+
+export type deleteApiV1TodosTodoIdImageResponse = (deleteApiV1TodosTodoIdImageResponseSuccess | deleteApiV1TodosTodoIdImageResponseError)
+
+export const getDeleteApiV1TodosTodoIdImageUrl = (todoId: number,) => {
+
+
+  
+
+  return `/api/v1/todos/${todoId}/image`
+}
+
+export const deleteApiV1TodosTodoIdImage = async (todoId: number, options?: RequestInit): Promise<deleteApiV1TodosTodoIdImageResponse> => {
+  
+  return customFetch<deleteApiV1TodosTodoIdImageResponse>(getDeleteApiV1TodosTodoIdImageUrl(todoId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getDeleteApiV1TodosTodoIdImageMutationOptions = <TError = Error | void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1TodosTodoIdImage>>, TError,{todoId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1TodosTodoIdImage>>, TError,{todoId: number}, TContext> => {
+
+const mutationKey = ['deleteApiV1TodosTodoIdImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiV1TodosTodoIdImage>>, {todoId: number}> = (props) => {
+          const {todoId} = props ?? {};
+
+          return  deleteApiV1TodosTodoIdImage(todoId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiV1TodosTodoIdImageMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiV1TodosTodoIdImage>>>
+    
+    export type DeleteApiV1TodosTodoIdImageMutationError = Error | void
+
+    /**
+ * @summary Todoの画像を削除する
+ */
+export const useDeleteApiV1TodosTodoIdImage = <TError = Error | void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiV1TodosTodoIdImage>>, TError,{todoId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiV1TodosTodoIdImage>>,
+        TError,
+        {todoId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteApiV1TodosTodoIdImageMutationOptions(options), queryClient);
+    }
+    
 /**
  * @summary Todo一覧を取得する
  */

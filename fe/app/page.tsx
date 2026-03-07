@@ -6,13 +6,16 @@ import { TodoInput } from "./components/todo-input";
 import {
   deleteApiV1TodosBulkDestroy,
   deleteApiV1TodosId,
+  deleteApiV1TodosTodoIdImage,
   patchApiV1TodosId,
   postApiV1Todos,
+  postApiV1TodosTodoIdImage,
   useGetApiV1Todos,
 } from "./generated/api-client/todoAPIV1";
 import { useAuth } from "./hooks/use-auth";
 import { useTodosMutation } from "./hooks/use-todos-mutation";
 import { selectData } from "./lib/api-client";
+import type { Todo } from "./types";
 
 type FilterType = "all" | "active" | "completed";
 
@@ -33,6 +36,7 @@ const TodoFooter = dynamic(
 export default function Home() {
   const { email, loading: authLoading, signOut, deleteAccount } = useAuth();
   const [filter, setFilter] = useState<FilterType>("all");
+  const [imageUploadFailed, setImageUploadFailed] = useState(false);
 
   const {
     data: todos = [],
@@ -45,17 +49,30 @@ export default function Home() {
   });
 
   const addMutation = useTodosMutation({
-    mutationFn: (text: string) => postApiV1Todos({ todo: { text } }),
-    updater: (text, todos) => [
+    mutationFn: (args: { text: string; image?: File }) =>
+      postApiV1Todos({ todo: { text: args.text } }),
+    updater: (args, todos) => [
       {
         id: -Date.now(),
-        text,
+        text: args.text,
         completed: false,
+        image_url: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
       ...todos,
     ],
+    onSuccess: async (data, args) => {
+      setImageUploadFailed(false);
+      if (args.image && "data" in data && data.data) {
+        const todo = data.data as Todo;
+        try {
+          await postApiV1TodosTodoIdImage(todo.id, { image: args.image });
+        } catch {
+          setImageUploadFailed(true);
+        }
+      }
+    },
   });
 
   const toggleMutation = useTodosMutation({
@@ -75,11 +92,18 @@ export default function Home() {
     updater: (_ids, todos) => todos.filter((t) => !t.completed),
   });
 
+  const deleteImageMutation = useTodosMutation({
+    mutationFn: (id: number) => deleteApiV1TodosTodoIdImage(id),
+    updater: (id, todos) =>
+      todos.map((t) => (t.id === id ? { ...t, image_url: null } : t)),
+  });
+
   const mutationError =
     addMutation.isError ||
     toggleMutation.isError ||
     deleteMutation.isError ||
-    clearCompletedMutation.isError;
+    clearCompletedMutation.isError ||
+    deleteImageMutation.isError;
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -139,7 +163,12 @@ export default function Home() {
         </header>
 
         <main id="main-content">
-          <TodoInput onAdd={(text) => addMutation.mutate(text)} />
+          <TodoInput
+            onAdd={(text, image) => {
+              setImageUploadFailed(false);
+              addMutation.mutate({ text, image });
+            }}
+          />
 
           {mutationError && (
             <p
@@ -147,6 +176,15 @@ export default function Home() {
               className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
             >
               Something went wrong. Please try again.
+            </p>
+          )}
+
+          {imageUploadFailed && (
+            <p
+              role="alert"
+              className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
+            >
+              Todo was created, but the image failed to upload.
             </p>
           )}
 
@@ -174,6 +212,7 @@ export default function Home() {
                     });
                 }}
                 onDelete={(id) => deleteMutation.mutate(id)}
+                onDeleteImage={(id) => deleteImageMutation.mutate(id)}
               />
               <TodoFooter
                 todos={todos}

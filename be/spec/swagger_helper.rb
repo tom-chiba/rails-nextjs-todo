@@ -22,10 +22,11 @@ RSpec.configure do |config|
               id: { type: :integer },
               text: { type: :string },
               completed: { type: :boolean },
+              image_url: { type: :string, nullable: true },
               created_at: { type: :string, format: "date-time" },
               updated_at: { type: :string, format: "date-time" }
             },
-            required: %w[id text completed created_at updated_at]
+            required: %w[id text completed image_url created_at updated_at]
           },
           TodoInput: {
             type: :object,

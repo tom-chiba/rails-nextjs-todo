@@ -9,6 +9,8 @@ export interface Todo {
   id: number;
   text: string;
   completed: boolean;
+  /** @nullable */
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 }

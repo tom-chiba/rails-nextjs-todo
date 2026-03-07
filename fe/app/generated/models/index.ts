@@ -15,6 +15,7 @@ export * from './meResponse';
 export * from './messageResponse';
 export * from './passwordResetInput';
 export * from './passwordResetRequestInput';
+export * from './postApiV1TodosTodoIdImageBody';
 export * from './registrationInput';
 export * from './todo';
 export * from './todoInput';
