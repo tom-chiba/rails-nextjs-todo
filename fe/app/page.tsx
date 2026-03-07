@@ -15,6 +15,7 @@ import {
 import { useAuth } from "./hooks/use-auth";
 import { useTodosMutation } from "./hooks/use-todos-mutation";
 import { selectData } from "./lib/api-client";
+import type { Todo } from "./types";
 
 type FilterType = "all" | "active" | "completed";
 
@@ -62,8 +63,12 @@ export default function Home() {
     ],
     onSuccess: async (data, args) => {
       if (args.image && "data" in data && data.data) {
-        const todo = data.data as { id: number };
-        await postApiV1TodosTodoIdImage(todo.id, { image: args.image });
+        const todo = data.data as Todo;
+        try {
+          await postApiV1TodosTodoIdImage(todo.id, { image: args.image });
+        } catch {
+          // Todo作成は成功済み。再フェッチで最新状態を取得
+        }
       }
     },
   });
