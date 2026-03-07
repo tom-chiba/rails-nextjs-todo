@@ -6,8 +6,10 @@ import { TodoInput } from "./components/todo-input";
 import {
   deleteApiV1TodosBulkDestroy,
   deleteApiV1TodosId,
+  deleteApiV1TodosTodoIdImage,
   patchApiV1TodosId,
   postApiV1Todos,
+  postApiV1TodosTodoIdImage,
   useGetApiV1Todos,
 } from "./generated/api-client/todoAPIV1";
 import { useAuth } from "./hooks/use-auth";
@@ -45,17 +47,25 @@ export default function Home() {
   });
 
   const addMutation = useTodosMutation({
-    mutationFn: (text: string) => postApiV1Todos({ todo: { text } }),
-    updater: (text, todos) => [
+    mutationFn: (args: { text: string; image?: File }) =>
+      postApiV1Todos({ todo: { text: args.text } }),
+    updater: (args, todos) => [
       {
         id: -Date.now(),
-        text,
+        text: args.text,
         completed: false,
+        image_url: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
       ...todos,
     ],
+    onSuccess: async (data, args) => {
+      if (args.image && "data" in data && data.data) {
+        const todo = data.data as { id: number };
+        await postApiV1TodosTodoIdImage(todo.id, { image: args.image });
+      }
+    },
   });
 
   const toggleMutation = useTodosMutation({
@@ -75,11 +85,18 @@ export default function Home() {
     updater: (_ids, todos) => todos.filter((t) => !t.completed),
   });
 
+  const deleteImageMutation = useTodosMutation({
+    mutationFn: (id: number) => deleteApiV1TodosTodoIdImage(id),
+    updater: (id, todos) =>
+      todos.map((t) => (t.id === id ? { ...t, image_url: null } : t)),
+  });
+
   const mutationError =
     addMutation.isError ||
     toggleMutation.isError ||
     deleteMutation.isError ||
-    clearCompletedMutation.isError;
+    clearCompletedMutation.isError ||
+    deleteImageMutation.isError;
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -139,7 +156,9 @@ export default function Home() {
         </header>
 
         <main id="main-content">
-          <TodoInput onAdd={(text) => addMutation.mutate(text)} />
+          <TodoInput
+            onAdd={(text, image) => addMutation.mutate({ text, image })}
+          />
 
           {mutationError && (
             <p
@@ -174,6 +193,7 @@ export default function Home() {
                     });
                 }}
                 onDelete={(id) => deleteMutation.mutate(id)}
+                onDeleteImage={(id) => deleteImageMutation.mutate(id)}
               />
               <TodoFooter
                 todos={todos}
