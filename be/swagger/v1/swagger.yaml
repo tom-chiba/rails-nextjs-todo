@@ -157,6 +157,7 @@ paths:
       summary: Todoに画像をアップロードする
       tags:
       - Todo Images
+      operationId: postApiV1TodosTodoIdImage
       parameters: []
       responses:
         '200':
@@ -188,14 +189,10 @@ paths:
                 image:
                   type: string
                   format: binary
-                  description: 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)
               required:
               - image
-            examples:
-              image:
-                summary: Todoに画像をアップロードする
-                value:
-                  image: binary
+        required: true
+        description: 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)
     delete:
       summary: Todoの画像を削除する
       tags:

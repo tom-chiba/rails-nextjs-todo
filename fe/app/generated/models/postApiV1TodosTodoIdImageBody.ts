@@ -6,6 +6,5 @@
  */
 
 export type PostApiV1TodosTodoIdImageBody = {
-  /** 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB) */
   image: Blob;
 };

@@ -11,16 +11,10 @@ RSpec.describe "Api::V1::TodoImages", type: :request do
 
     post "Todoに画像をアップロードする" do
       tags "Todo Images"
+      operationId "postApiV1TodosTodoIdImage"
       consumes "multipart/form-data"
       produces "application/json"
-      request_body_example value: { image: "binary" }, name: "image"
-      parameter name: :body, in: :body, schema: {
-        type: :object,
-        properties: {
-          image: { type: :string, format: :binary, description: "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)" }
-        },
-        required: %w[image]
-      }
+      parameter name: :image, in: :formData, type: :file, required: true, description: "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)"
 
       response "200", "アップロード成功" do
         schema "$ref" => "#/components/schemas/Todo"
