@@ -10,14 +10,6 @@ type TodoItemProps = {
   onDeleteImage?: (id: number) => void;
 };
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
-
-function resolveImageUrl(url: string): string {
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${API_BASE}${url}`;
-}
-
 export function TodoItem({
   todo,
   onToggle,
@@ -51,7 +43,7 @@ export function TodoItem({
           <div className="mt-2 flex items-end gap-2">
             {/* biome-ignore lint/performance/noImgElement: external API URL requires native img */}
             <img
-              src={resolveImageUrl(todo.image_url)}
+              src={todo.image_url}
               alt={`Attachment for "${todo.text}"`}
               className="h-20 w-20 rounded-md border border-ink-faint/30 object-cover"
             />

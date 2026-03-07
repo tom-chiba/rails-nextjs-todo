@@ -12,11 +12,13 @@ class Todo < ApplicationRecord
   def image_url
     return nil unless image.attached?
 
-    Rails.application.routes.url_helpers.rails_blob_url(image, only_path: true)
+    Rails.application.routes.url_helpers.rails_blob_url(image)
   end
 
   def as_json(options = {})
-    super(options.merge(methods: :image_url, except: []))
+    super(options.merge(
+      methods: Array(options[:methods]) | [:image_url]
+    ))
   end
 
   private
@@ -24,7 +26,8 @@ class Todo < ApplicationRecord
   def acceptable_image
     return unless image.attached?
 
-    unless image.content_type.in?(ALLOWED_IMAGE_TYPES)
+    detected = Marcel::MimeType.for(image.blob.download, name: image.filename.to_s)
+    unless detected.in?(ALLOWED_IMAGE_TYPES)
       errors.add(:image, "must be a JPEG, PNG, GIF, or WebP")
     end
 
