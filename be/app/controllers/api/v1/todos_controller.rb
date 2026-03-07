@@ -4,7 +4,7 @@ module Api
       before_action :set_todo, only: [ :update, :destroy ]
 
       def index
-        @todos = Current.user.todos.order(created_at: :desc)
+        @todos = Current.user.todos.with_attached_image.order(created_at: :desc)
         render json: @todos
       end
 
