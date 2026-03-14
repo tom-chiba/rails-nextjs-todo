@@ -44,6 +44,32 @@ RSpec.describe "Api::V1::Todos" do
         expect(Todo.last.user).to eq(user)
       end
 
+      it "creates a todo with an image in a single request" do
+        image = fixture_file_upload("test.jpg", "image/jpeg")
+
+        expect {
+          post api_v1_todos_path, params: { todo: { text: "Todo with image" }, image: image }
+        }.to change(Todo, :count).by(1)
+
+        expect(response).to have_http_status(:created)
+
+        json = response.parsed_body
+        expect(json["text"]).to eq("Todo with image")
+        expect(json["image_url"]).to be_present
+        expect(Todo.last.image).to be_attached
+      end
+
+      it "rejects todo creation when image is invalid" do
+        invalid_image = fixture_file_upload("test.txt", "text/plain")
+
+        expect {
+          post api_v1_todos_path, params: { todo: { text: "Todo with bad image" }, image: invalid_image }
+        }.not_to change(Todo, :count)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body).to have_key("errors")
+      end
+
       it "returns errors with invalid params" do
         expect {
           post api_v1_todos_path, params: { todo: { text: "" } }, as: :json

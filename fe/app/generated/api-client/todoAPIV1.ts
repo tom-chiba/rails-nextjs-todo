@@ -33,6 +33,7 @@ import type {
   MessageResponse,
   PasswordResetInput,
   PasswordResetRequestInput,
+  PostApiV1TodosBody,
   PostApiV1TodosTodoIdImageBody,
   RegistrationInput,
   Todo,
@@ -1052,15 +1053,23 @@ export const getPostApiV1TodosUrl = () => {
   return `/api/v1/todos`
 }
 
-export const postApiV1Todos = async (todoInput: TodoInput, options?: RequestInit): Promise<postApiV1TodosResponse> => {
-  
+export const postApiV1Todos = async (postApiV1TodosBody: PostApiV1TodosBody, options?: RequestInit): Promise<postApiV1TodosResponse> => {
+    const formData = new FormData();
+formData.append(`todo[text]`, postApiV1TodosBody['todo[text]']);
+if(postApiV1TodosBody['todo[completed]'] !== undefined) {
+ formData.append(`todo[completed]`, postApiV1TodosBody['todo[completed]'].toString())
+ }
+if(postApiV1TodosBody.image !== undefined) {
+ formData.append(`image`, postApiV1TodosBody.image);
+ }
+
   return customFetch<postApiV1TodosResponse>(getPostApiV1TodosUrl(),
   {      
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      todoInput,)
+    method: 'POST'
+    ,
+    body: 
+      formData,
   }
 );}
   
@@ -1068,8 +1077,8 @@ export const postApiV1Todos = async (todoInput: TodoInput, options?: RequestInit
 
 
 export const getPostApiV1TodosMutationOptions = <TError = Error | Errors,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1Todos>>, TError,{data: TodoInput}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof postApiV1Todos>>, TError,{data: TodoInput}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1Todos>>, TError,{data: PostApiV1TodosBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1Todos>>, TError,{data: PostApiV1TodosBody}, TContext> => {
 
 const mutationKey = ['postApiV1Todos'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1081,7 +1090,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1Todos>>, {data: TodoInput}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1Todos>>, {data: PostApiV1TodosBody}> = (props) => {
           const {data} = props ?? {};
 
           return  postApiV1Todos(data,requestOptions)
@@ -1095,18 +1104,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostApiV1TodosMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1Todos>>>
-    export type PostApiV1TodosMutationBody = TodoInput
+    export type PostApiV1TodosMutationBody = PostApiV1TodosBody
     export type PostApiV1TodosMutationError = Error | Errors
 
     /**
  * @summary Todoを作成する
  */
 export const usePostApiV1Todos = <TError = Error | Errors,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1Todos>>, TError,{data: TodoInput}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1Todos>>, TError,{data: PostApiV1TodosBody}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postApiV1Todos>>,
         TError,
-        {data: TodoInput},
+        {data: PostApiV1TodosBody},
         TContext
       > => {
       return useMutation(getPostApiV1TodosMutationOptions(options), queryClient);

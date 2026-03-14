@@ -5,7 +5,11 @@
  * OpenAPI spec version: v1
  */
 
-export type PostApiV1TodosTodoIdImageBody = {
+export type PostApiV1TodosBody = {
+  /** Todoテキスト */
+  'todo[text]': string;
+  /** 完了フラグ */
+  'todo[completed]'?: boolean;
   /** 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB) */
-  image: Blob;
+  image?: Blob;
 };

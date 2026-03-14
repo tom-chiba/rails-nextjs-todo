@@ -31,25 +31,31 @@ RSpec.describe "Api::V1::Todos", type: :request do
 
     post "Todoを作成する" do
       tags "Todos"
-      consumes "application/json"
+      consumes "multipart/form-data"
       produces "application/json"
-      parameter name: :params, in: :body, schema: { "$ref" => "#/components/schemas/TodoInput" }
+      parameter name: :"todo[text]", in: :formData, type: :string, required: true, description: "Todoテキスト"
+      parameter name: :"todo[completed]", in: :formData, type: :boolean, required: false, description: "完了フラグ"
+      parameter name: :image, in: :formData, type: :file, required: false, description: "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)"
 
-      response "201", "作成成功" do
+      response "201", "作成成功（画像なし）" do
         schema "$ref" => "#/components/schemas/Todo"
-        let(:params) { { todo: { text: "New todo" } } }
+        let(:"todo[text]") { "New todo" }
+        let(:image) { nil }
 
         run_test! do |response|
           json = response.parsed_body
           expect(json["text"]).to eq("New todo")
           expect(json["completed"]).to be false
+          expect(json["image_url"]).to be_nil
         end
       end
 
       response "422", "バリデーションエラー" do
         schema "$ref" => "#/components/schemas/Errors"
 
-        let(:params) { { todo: { text: "" } } }
+        let(:"todo[text]") { "" }
+        let(:"todo[completed]") { nil }
+        let(:image) { nil }
 
         run_test! do |response|
           expect(response.parsed_body).to have_key("errors")
@@ -59,7 +65,9 @@ RSpec.describe "Api::V1::Todos", type: :request do
       response "401", "未認証" do
         schema "$ref" => "#/components/schemas/Error"
         let(:authenticate) { nil }
-        let(:params) { { todo: { text: "Test" } } }
+        let(:"todo[text]") { "Test" }
+        let(:"todo[completed]") { nil }
+        let(:image) { nil }
 
         run_test!
       end
