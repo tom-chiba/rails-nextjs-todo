@@ -199,7 +199,7 @@ paths:
       parameters: []
       responses:
         '201':
-          description: 作成成功（画像なし）
+          description: 作成成功
           content:
             application/json:
               schema:

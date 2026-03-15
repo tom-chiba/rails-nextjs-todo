@@ -8,11 +8,9 @@ import type { Todo } from "../types";
 export function useTodosMutation<TVariables, TData>({
   mutationFn,
   updater,
-  onSuccess,
 }: {
   mutationFn: MutationFunction<TData, TVariables>;
   updater: (variables: TVariables, todos: Todo[]) => Todo[];
-  onSuccess?: (data: TData, variables: TVariables) => void | Promise<void>;
 }) {
   const queryClient = useQueryClient();
   const todosQueryKey = getGetApiV1TodosQueryKey();
@@ -31,9 +29,6 @@ export function useTodosMutation<TVariables, TData>({
         },
       );
       return { previous };
-    },
-    onSuccess: async (data, variables) => {
-      if (onSuccess) await onSuccess(data, variables);
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {

@@ -43,7 +43,7 @@ ADR-0022 で示された拡張パスに従い、専用エンドポイントを�
 #### バックエンド
 
 - `TodosController#create` で `params[:image]` を受け取り、`@todo.image.attach` する
-- 画像付きの場合、Todo保存と画像添付がトランザクション内でアトミックに行われる（Active Storage の挙動）
+- 画像付きの場合、未保存レコードへの `attach` は `attachment_changes` に記録されるのみで、`save` 時にレコードと共にまとめて永続化される。save が失敗した場合は blob も永続化されないため、データの整合性が保証される（Active Storage の遅延添付の挙動）
 - 画像バリデーション（型・サイズ）は既存の `Todo#acceptable_image` がそのまま機能する
 - rswag spec を `multipart/form-data` に変更し、swagger.rake のポスト処理（ADR-0023）を拡張
 

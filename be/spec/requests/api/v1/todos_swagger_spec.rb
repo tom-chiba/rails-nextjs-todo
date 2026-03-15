@@ -37,7 +37,7 @@ RSpec.describe "Api::V1::Todos", type: :request do
       parameter name: :"todo[completed]", in: :formData, type: :boolean, required: false, description: "完了フラグ"
       parameter name: :image, in: :formData, type: :file, required: false, description: "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)"
 
-      response "201", "作成成功（画像なし）" do
+      response "201", "作成成功" do
         schema "$ref" => "#/components/schemas/Todo"
         let(:"todo[text]") { "New todo" }
         let(:image) { nil }

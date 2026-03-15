@@ -80,12 +80,14 @@ beforeEach(() => {
     isLoading: false,
   });
   (api.postApiV1Todos as Mock).mockImplementation(
-    async (input: { "todo[text]": string }) => ({
+    async (input: { "todo[text]": string; image?: File }) => ({
       data: {
         id: nextId++,
         text: input["todo[text]"],
         completed: false,
-        image_url: null,
+        image_url: input.image
+          ? "http://localhost:3000/test-image.jpg"
+          : null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       } satisfies Todo,
@@ -142,6 +144,34 @@ describe("Home", () => {
       expect(api.postApiV1Todos).toHaveBeenCalledWith({
         "todo[text]": "Buy milk",
       });
+    });
+  });
+
+  it("画像付きTodoを追加できる", async () => {
+    const user = userEvent.setup();
+    renderWithQueryClient(<Home />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("New todo")).toBeDefined();
+    });
+
+    const input = screen.getByLabelText("New todo");
+    await user.type(input, "Todo with image");
+
+    const file = new File(["dummy"], "photo.png", { type: "image/png" });
+    const fileInput = screen.getByLabelText("Select image file");
+    await user.upload(fileInput, file);
+
+    (api.postApiV1Todos as Mock).mockClear();
+    await user.click(screen.getByLabelText("Add todo"));
+
+    await waitFor(() => {
+      expect(api.postApiV1Todos).toHaveBeenCalledWith(
+        expect.objectContaining({
+          "todo[text]": "Todo with image",
+          image: file,
+        }),
+      );
     });
   });
 
