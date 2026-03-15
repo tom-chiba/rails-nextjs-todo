@@ -9,13 +9,11 @@ import {
   deleteApiV1TodosTodoIdImage,
   patchApiV1TodosId,
   postApiV1Todos,
-  postApiV1TodosTodoIdImage,
   useGetApiV1Todos,
 } from "./generated/api-client/todoAPIV1";
 import { useAuth } from "./hooks/use-auth";
 import { useTodosMutation } from "./hooks/use-todos-mutation";
 import { selectData } from "./lib/api-client";
-import type { Todo } from "./types";
 
 type FilterType = "all" | "active" | "completed";
 
@@ -36,8 +34,6 @@ const TodoFooter = dynamic(
 export default function Home() {
   const { email, loading: authLoading, signOut, deleteAccount } = useAuth();
   const [filter, setFilter] = useState<FilterType>("all");
-  const [imageUploadFailed, setImageUploadFailed] = useState(false);
-
   const {
     data: todos = [],
     isLoading: loading,
@@ -50,7 +46,10 @@ export default function Home() {
 
   const addMutation = useTodosMutation({
     mutationFn: (args: { text: string; image?: File }) =>
-      postApiV1Todos({ todo: { text: args.text } }),
+      postApiV1Todos({
+        "todo[text]": args.text,
+        ...(args.image ? { image: args.image } : {}),
+      }),
     updater: (args, todos) => [
       {
         id: -Date.now(),
@@ -62,17 +61,6 @@ export default function Home() {
       },
       ...todos,
     ],
-    onSuccess: async (data, args) => {
-      setImageUploadFailed(false);
-      if (args.image && "data" in data && data.data) {
-        const todo = data.data as Todo;
-        try {
-          await postApiV1TodosTodoIdImage(todo.id, { image: args.image });
-        } catch {
-          setImageUploadFailed(true);
-        }
-      }
-    },
   });
 
   const toggleMutation = useTodosMutation({
@@ -164,10 +152,7 @@ export default function Home() {
 
         <main id="main-content">
           <TodoInput
-            onAdd={(text, image) => {
-              setImageUploadFailed(false);
-              addMutation.mutate({ text, image });
-            }}
+            onAdd={(text, image) => addMutation.mutate({ text, image })}
           />
 
           {mutationError && (
@@ -176,15 +161,6 @@ export default function Home() {
               className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
             >
               Something went wrong. Please try again.
-            </p>
-          )}
-
-          {imageUploadFailed && (
-            <p
-              role="alert"
-              className="mt-3 text-center text-sm text-accent-vermillion animate-fade-in"
-            >
-              Todo was created, but the image failed to upload.
             </p>
           )}
 

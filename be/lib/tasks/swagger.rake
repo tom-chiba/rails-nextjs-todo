@@ -1,33 +1,62 @@
-# rswag が生成する OpenAPI 2.0 形式の "type: file" を
+# rswag が生成する OpenAPI 2.0 形式の formData パラメータを
 # OpenAPI 3.0 準拠の multipart/form-data スキーマに変換する
+#
+# rswag 2.x は formData パラメータを正しく OpenAPI 3.0 に変換できない:
+# - 単一の file パラメータ → schema が `type: file` になる (OpenAPI 2.0 形式)
+# - 複数の formData パラメータ → 最初のパラメータの情報のみ残り他が消失
+#
+# この Rake タスクで正しい OpenAPI 3.0 multipart スキーマに置換する。
+# 詳細: ADR-0023
 namespace :swagger do
+  # rswag spec の formData パラメータ定義から正しい OpenAPI 3.0 スキーマを構築する。
+  # キー: "METHOD /path", 値: { properties: { ... }, required: [...] }
+  MULTIPART_SCHEMAS = {
+    "post /api/v1/todos/{todo_id}/image" => {
+      "type" => "object",
+      "properties" => {
+        "image" => { "type" => "string", "format" => "binary", "description" => "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)" }
+      },
+      "required" => [ "image" ]
+    },
+    "post /api/v1/todos" => {
+      "type" => "object",
+      "properties" => {
+        "todo[text]" => { "type" => "string", "description" => "Todoテキスト" },
+        "todo[completed]" => { "type" => "boolean", "description" => "完了フラグ" },
+        "image" => { "type" => "string", "format" => "binary", "description" => "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)" }
+      },
+      "required" => [ "todo[text]" ]
+    }
+  }.freeze
+
   task fix_file_types: :environment do
     swagger_root = Rails.root.join("swagger")
     Dir.glob(swagger_root.join("**/*.yaml")).each do |file_path|
-      content = File.read(file_path)
-      next unless content.include?("type: file")
+      yaml = YAML.safe_load(File.read(file_path), permitted_classes: [ Symbol ])
+      changed = false
 
-      yaml = YAML.safe_load(content, permitted_classes: [ Symbol ])
-      yaml["paths"]&.each_value do |path_item|
-        path_item.each_value do |operation|
+      yaml["paths"]&.each do |path, path_item|
+        path_item.each do |method, operation|
           next unless operation.is_a?(Hash) && operation["requestBody"]
 
-          operation["requestBody"]["content"]&.each_value do |media_type|
-            schema = media_type["schema"]
-            next unless schema.is_a?(Hash) && schema["type"] == "file"
+          multipart = operation.dig("requestBody", "content", "multipart/form-data")
+          next unless multipart
 
-            media_type["schema"] = {
-              "type" => "object",
-              "properties" => {
-                "image" => { "type" => "string", "format" => "binary" }
-              },
-              "required" => [ "image" ]
-            }
-          end
+          key = "#{method} #{path}"
+          schema = MULTIPART_SCHEMAS[key]
+          next unless schema
+
+          multipart["schema"] = schema
+          operation["requestBody"].delete("required")
+          operation["requestBody"].delete("description")
+          changed = true
         end
       end
-      File.write(file_path, yaml.to_yaml)
-      puts "Fixed OpenAPI file types in #{file_path}"
+
+      if changed
+        File.write(file_path, yaml.to_yaml)
+        puts "Fixed OpenAPI multipart schemas in #{file_path}"
+      end
     end
   end
 end

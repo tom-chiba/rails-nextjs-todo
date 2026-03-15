@@ -17,7 +17,6 @@ vi.mock("./generated/api-client/todoAPIV1", () => ({
   useGetApiV1Todos: vi.fn(),
   getGetApiV1TodosQueryKey: vi.fn(() => ["/api/v1/todos"]),
   postApiV1Todos: vi.fn(),
-  postApiV1TodosTodoIdImage: vi.fn(),
   patchApiV1TodosId: vi.fn(),
   deleteApiV1TodosId: vi.fn(),
   deleteApiV1TodosBulkDestroy: vi.fn(),
@@ -81,10 +80,10 @@ beforeEach(() => {
     isLoading: false,
   });
   (api.postApiV1Todos as Mock).mockImplementation(
-    async (input: { todo: { text: string } }) => ({
+    async (input: { "todo[text]": string }) => ({
       data: {
         id: nextId++,
-        text: input.todo.text,
+        text: input["todo[text]"],
         completed: false,
         image_url: null,
         created_at: new Date().toISOString(),
@@ -141,7 +140,7 @@ describe("Home", () => {
 
     await waitFor(() => {
       expect(api.postApiV1Todos).toHaveBeenCalledWith({
-        todo: { text: "Buy milk" },
+        "todo[text]": "Buy milk",
       });
     });
   });

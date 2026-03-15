@@ -10,6 +10,7 @@ module Api
 
       def create
         @todo = Current.user.todos.new(todo_params)
+        @todo.image.attach(params[:image]) if params[:image].present?
 
         if @todo.save
           render json: @todo, status: :created

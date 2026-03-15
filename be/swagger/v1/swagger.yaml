@@ -189,10 +189,9 @@ paths:
                 image:
                   type: string
                   format: binary
+                  description: 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)
               required:
               - image
-        required: true
-        description: 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)
     delete:
       summary: Todoの画像を削除する
       tags:
@@ -239,7 +238,7 @@ paths:
       parameters: []
       responses:
         '201':
-          description: 作成成功
+          description: 作成成功（画像なし）
           content:
             application/json:
               schema:
@@ -258,9 +257,22 @@ paths:
                 "$ref": "#/components/schemas/Error"
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              "$ref": "#/components/schemas/TodoInput"
+              type: object
+              properties:
+                todo[text]:
+                  type: string
+                  description: Todoテキスト
+                todo[completed]:
+                  type: boolean
+                  description: 完了フラグ
+                image:
+                  type: string
+                  format: binary
+                  description: 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)
+              required:
+              - todo[text]
   "/api/v1/todos/bulk_destroy":
     delete:
       summary: Todoを一括削除する

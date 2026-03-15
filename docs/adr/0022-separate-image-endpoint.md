@@ -1,7 +1,8 @@
 ---
-status: "accepted"
+status: "superseded"
 date: 2026-03-07
 decision-makers: []
+superseded-by: "0024-atomic-todo-creation-with-image.md"
 ---
 
 # ADR-0022: 画像専用エンドポイントによる Todo 画像 API 設計
