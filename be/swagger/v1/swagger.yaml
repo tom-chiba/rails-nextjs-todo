@@ -153,45 +153,6 @@ paths:
       required: true
       schema:
         type: integer
-    post:
-      summary: Todoに画像をアップロードする
-      tags:
-      - Todo Images
-      operationId: postApiV1TodosTodoIdImage
-      parameters: []
-      responses:
-        '200':
-          description: アップロード成功
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Todo"
-        '422':
-          description: バリデーションエラー
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Errors"
-        '404':
-          description: Todo Not Found
-        '401':
-          description: 未認証
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/Error"
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                image:
-                  type: string
-                  format: binary
-                  description: 画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)
-              required:
-              - image
     delete:
       summary: Todoの画像を削除する
       tags:
