@@ -10,14 +10,9 @@
 namespace :swagger do
   # rswag spec の formData パラメータ定義から正しい OpenAPI 3.0 スキーマを構築する。
   # キー: "METHOD /path", 値: { properties: { ... }, required: [...] }
+  # TODO: rswag が OpenAPI 3.0 の multipart/form-data を正しく生成できるようになったら、
+  #       このタスク全体を削除する。
   MULTIPART_SCHEMAS = {
-    "post /api/v1/todos/{todo_id}/image" => {
-      "type" => "object",
-      "properties" => {
-        "image" => { "type" => "string", "format" => "binary", "description" => "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)" }
-      },
-      "required" => [ "image" ]
-    },
     "post /api/v1/todos" => {
       "type" => "object",
       "properties" => {

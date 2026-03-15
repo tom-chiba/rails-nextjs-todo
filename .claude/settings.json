@@ -1,7 +1,7 @@
 {
   "env": {
-    "language": "日本語",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ENABLE_TOOL_SEARCH": "true"
   },
   "permissions": {
     "allow": [
@@ -52,5 +52,6 @@
     "a11y-specialist-skills@a11y-specialist-skills": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "code-review@claude-plugins-official": true
-  }
+  },
+  "language": "日本語"
 }
