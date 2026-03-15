@@ -70,6 +70,7 @@ function renderWithQueryClient(ui: React.ReactElement) {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks();
   nextId = 1;
   (api.useGetApiV1Me as Mock).mockReturnValue({
     data: { id: 1, email_address: "test@example.com" },
@@ -160,7 +161,6 @@ describe("Home", () => {
     const fileInput = screen.getByLabelText("Select image file");
     await user.upload(fileInput, file);
 
-    (api.postApiV1Todos as Mock).mockClear();
     await user.click(screen.getByLabelText("Add todo"));
 
     await waitFor(() => {
