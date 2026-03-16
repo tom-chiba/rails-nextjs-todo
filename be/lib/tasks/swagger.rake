@@ -57,6 +57,9 @@ namespace :swagger do
 end
 
 # rswag:specs:swaggerize の後に自動で fix_file_types を実行
-Rake::Task["rswag:specs:swaggerize"].enhance do
-  Rake::Task["swagger:fix_file_types"].invoke
+# rswag は development/test のみのため、本番環境ではタスクが存在しない
+if Rake::Task.task_defined?("rswag:specs:swaggerize")
+  Rake::Task["rswag:specs:swaggerize"].enhance do
+    Rake::Task["swagger:fix_file_types"].invoke
+  end
 end
