@@ -1,9 +1,15 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# frozen_string_literal: true
+
+# Seeds are development-only. Abort if accidentally run in production.
+if Rails.env.production?
+  abort "Seeds are not intended for production. Aborting."
+end
+
+# Load all seed files from db/seeds/ directory in sorted order.
+# To add seeds for a new model, simply create a new file in db/seeds/.
+Dir[Rails.root.join("db/seeds/*.rb")].sort.each do |seed_file|
+  puts "Loading #{File.basename(seed_file)}..."
+  load seed_file
+end
+
+puts "Seed complete!"
