@@ -41,6 +41,7 @@ export function TodoItem({
     const trimmed = editText.trim();
     if (!trimmed) {
       setEditError("Todo text cannot be empty");
+      skipBlurRef.current = false;
       return;
     }
     if (trimmed !== todo.text) {
@@ -56,11 +57,14 @@ export function TodoItem({
     setEditError(null);
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    skipBlurRef.current = true;
+    handleSave();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      skipBlurRef.current = true;
-      handleSave();
-    } else if (e.key === "Escape") {
+    if (e.key === "Escape") {
       skipBlurRef.current = true;
       handleCancel();
     }
@@ -88,7 +92,7 @@ export function TodoItem({
       />
       <div className="flex-1 min-w-0">
         {isEditing ? (
-          <>
+          <form onSubmit={handleSubmit}>
             <input
               ref={inputRef}
               type="text"
@@ -107,7 +111,7 @@ export function TodoItem({
                 {editError}
               </p>
             )}
-          </>
+          </form>
         ) : (
           <>
             <span
