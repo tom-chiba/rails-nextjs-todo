@@ -23,11 +23,17 @@ export function TodoItem({
   const [editText, setEditText] = useState(todo.text);
   const [editError, setEditError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const editButtonRef = useRef<HTMLButtonElement>(null);
   const skipBlurRef = useRef(false);
+  const wasEditingRef = useRef(false);
 
   useEffect(() => {
     if (isEditing) {
       inputRef.current?.focus();
+      wasEditingRef.current = true;
+    } else if (wasEditingRef.current) {
+      editButtonRef.current?.focus();
+      wasEditingRef.current = false;
     }
   }, [isEditing]);
 
@@ -57,7 +63,7 @@ export function TodoItem({
     setEditError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     skipBlurRef.current = true;
     handleSave();
@@ -105,9 +111,14 @@ export function TodoItem({
               onBlur={handleBlur}
               className="ink-input w-full text-base"
               aria-label={`Edit todo: ${todo.text}`}
+              aria-describedby={editError ? `edit-error-${todo.id}` : undefined}
             />
             {editError && (
-              <p role="alert" className="mt-1 text-xs text-accent-vermillion">
+              <p
+                id={`edit-error-${todo.id}`}
+                role="alert"
+                className="mt-1 text-xs text-accent-vermillion"
+              >
                 {editError}
               </p>
             )}
@@ -145,6 +156,7 @@ export function TodoItem({
       {!isEditing && (
         <>
           <button
+            ref={editButtonRef}
             type="button"
             onClick={handleEditStart}
             className="text-ink-faint opacity-0 transition-all hover:text-ink-medium group-hover:opacity-100 focus:opacity-100 mt-1"
