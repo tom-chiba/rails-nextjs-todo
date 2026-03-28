@@ -113,35 +113,33 @@ export function TodoItem({
             )}
           </form>
         ) : (
-          <>
-            <span
-              className={`text-base leading-relaxed transition-colors duration-300 ${
-                todo.completed ? "todo-done-text" : "text-ink-dark"
-              }`}
-            >
-              {todo.text}
-            </span>
-            {todo.image_url && (
-              <div className="mt-2 flex items-end gap-2">
-                {/* biome-ignore lint/performance/noImgElement: external API URL requires native img */}
-                <img
-                  src={todo.image_url}
-                  alt={`Attachment for "${todo.text}"`}
-                  className="h-20 w-20 rounded-md border border-ink-faint/30 object-cover"
-                />
-                {onDeleteImage && (
-                  <button
-                    type="button"
-                    onClick={() => onDeleteImage(todo.id)}
-                    className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion opacity-0 group-hover:opacity-100 focus:opacity-100"
-                    aria-label={`Remove image from "${todo.text}"`}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
+          <span
+            className={`text-base leading-relaxed transition-colors duration-300 ${
+              todo.completed ? "todo-done-text" : "text-ink-dark"
+            }`}
+          >
+            {todo.text}
+          </span>
+        )}
+        {todo.image_url && (
+          <div className="mt-2 flex items-end gap-2">
+            {/* biome-ignore lint/performance/noImgElement: external API URL requires native img */}
+            <img
+              src={todo.image_url}
+              alt={`Attachment for "${todo.text}"`}
+              className="h-20 w-20 rounded-md border border-ink-faint/30 object-cover"
+            />
+            {onDeleteImage && !isEditing && (
+              <button
+                type="button"
+                onClick={() => onDeleteImage(todo.id)}
+                className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion opacity-0 group-hover:opacity-100 focus:opacity-100"
+                aria-label={`Remove image from "${todo.text}"`}
+              >
+                Remove
+              </button>
             )}
-          </>
+          </div>
         )}
       </div>
       {!isEditing && (
