@@ -15,6 +15,7 @@
       "Bash(git checkout -b *)",
       "Bash(git push -u origin *)",
       "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
       "Bash(gh pr create *)",
       "Bash(gh pr view *)",
       "Bash(gh pr diff *)",
