@@ -8,6 +8,10 @@
 - **型のインポート元**: 生成された型は `app/generated/models/` から直接使わず `app/types.ts` 経由で使う
 - **401エラー処理**: 個別コンポーネントではなく `QueryCache.onError` で一元管理。各所にリダイレクトロジックを書かない
 
+## ADR
+
+- **置き場所**: `docs/adr/` に配置。`docs/adr/template.md` のフォーマットに従う
+
 ## ブランチ戦略
 
 - **GitHub Flow**: `main` から feature ブランチを切り、PR 経由でマージ

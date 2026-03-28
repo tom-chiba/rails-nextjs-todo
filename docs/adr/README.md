@@ -29,6 +29,12 @@
 | [ADR-0017](0017-me-endpoint-for-user-info.md) | ユーザー情報取得を/meエンドポイントに統一 | accepted | 2026-02-23 |
 | [ADR-0018](0018-session-cookie-subdomain-sharing.md) | セッションCookieのサブドメイン間共有 | accepted | 2026-02-23 |
 | [ADR-0019](0019-kamal-destinations-for-deploy-config.md) | Kamal Destinationsによるデプロイ先設定の分離 | accepted | 2026-02-23 |
+| [ADR-0020](0020-tanstack-query-orval-data-fetching.md) | TanStack Query + Orvalによるデータフェッチ | accepted | - |
+| [ADR-0021](0021-active-storage-for-todo-images.md) | Active StorageによるTodo画像管理 | accepted | - |
+| [ADR-0022](0022-separate-image-endpoint.md) | 画像専用エンドポイントの分離 | superseded | - |
+| [ADR-0023](0023-swagger-file-type-post-processing.md) | Swaggerファイルタイプのポスト処理 | accepted | - |
+| [ADR-0024](0024-atomic-todo-creation-with-image.md) | Todo作成と画像アップロードを1リクエストに統合 | accepted | 2026-03-14 |
+| [ADR-0025](0025-unify-url-options-env-vars.md) | Active Storage URL生成の環境変数をHOST/PORTに統一 | accepted | 2026-03-28 |
 
 ## 新しいADRの作成方法
 
