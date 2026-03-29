@@ -86,12 +86,20 @@ export default function Home() {
       todos.map((t) => (t.id === id ? { ...t, image_url: null } : t)),
   });
 
+  const editMutation = useTodosMutation({
+    mutationFn: ({ id, text }: { id: number; text: string }) =>
+      patchApiV1TodosId(id, { todo: { text } }),
+    updater: ({ id, text }, todos) =>
+      todos.map((t) => (t.id === id ? { ...t, text } : t)),
+  });
+
   const mutationError =
     addMutation.isError ||
     toggleMutation.isError ||
     deleteMutation.isError ||
     clearCompletedMutation.isError ||
-    deleteImageMutation.isError;
+    deleteImageMutation.isError ||
+    editMutation.isError;
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -189,6 +197,7 @@ export default function Home() {
                 }}
                 onDelete={(id) => deleteMutation.mutate(id)}
                 onDeleteImage={(id) => deleteImageMutation.mutate(id)}
+                onEdit={(id, text) => editMutation.mutate({ id, text })}
               />
               <TodoFooter
                 todos={todos}
