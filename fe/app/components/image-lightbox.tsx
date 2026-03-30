@@ -54,7 +54,6 @@ export function ImageLightbox({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      aria-hidden="true"
     >
       <div
         role="dialog"
