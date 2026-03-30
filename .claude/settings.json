@@ -53,7 +53,8 @@
     "a11y-specialist-skills@a11y-specialist-skills": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
-    "hookify@claude-plugins-official": true
+    "hookify@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true
   },
   "language": "日本語"
 }
