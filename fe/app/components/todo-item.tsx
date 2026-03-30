@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { Todo } from "../types";
+import { ImageLightbox } from "./image-lightbox";
 
 type TodoItemProps = {
   todo: Todo;
@@ -26,6 +27,8 @@ export function TodoItem({
   const editButtonRef = useRef<HTMLButtonElement>(null);
   const skipBlurRef = useRef(false);
   const wasEditingRef = useRef(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const thumbnailButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isEditing) {
@@ -134,12 +137,21 @@ export function TodoItem({
         )}
         {todo.image_url && (
           <div className="mt-2 flex items-end gap-2">
-            {/* biome-ignore lint/performance/noImgElement: external API URL requires native img */}
-            <img
-              src={todo.image_url}
-              alt={`Attachment for "${todo.text}"`}
-              className="h-20 w-20 rounded-md border border-ink-faint/30 object-cover"
-            />
+            <button
+              ref={thumbnailButtonRef}
+              type="button"
+              onClick={() => setLightboxOpen(true)}
+              className="cursor-zoom-in rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-vermillion"
+              aria-label={`View full image for "${todo.text}"`}
+            >
+              {/* biome-ignore lint/performance/noImgElement: external API URL requires native img */}
+              <img
+                src={todo.image_url}
+                alt=""
+                aria-hidden="true"
+                className="h-20 w-20 rounded-md border border-ink-faint/30 object-cover transition-opacity hover:opacity-80"
+              />
+            </button>
             {onDeleteImage && !isEditing && (
               <button
                 type="button"
@@ -152,6 +164,16 @@ export function TodoItem({
             )}
           </div>
         )}
+        <AnimatePresence>
+          {lightboxOpen && todo.image_url && (
+            <ImageLightbox
+              src={todo.image_url}
+              alt={`Attachment for "${todo.text}"`}
+              onClose={() => setLightboxOpen(false)}
+              triggerRef={thumbnailButtonRef}
+            />
+          )}
+        </AnimatePresence>
       </div>
       {!isEditing && (
         <>
