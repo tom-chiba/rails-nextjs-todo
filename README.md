@@ -2,11 +2,10 @@
 
 1. `gh auth login` で `gh` コマンドを使えるように
 2. `claude` を実行して使える環境を Claude Code を使えるように
-3. Claude Code 内で `/plugin marketplace add thkt/claude-config`
-4. Claude Code 内で `/plugin marketplace add masuP9/a11y-specialist-skills`
-5. fe/.env.example をベースに fe/.env を作成
-6. fe/ 内で `npm i`
-7. be/ 内で `bundle install`
+3. Claude Code 内で `/plugin marketplace add masuP9/a11y-specialist-skills`
+4. fe/.env.example をベースに fe/.env を作成
+5. fe/ 内で `npm i`
+6. be/ 内で `bundle install`
 
 ## 本番デプロイ
 
