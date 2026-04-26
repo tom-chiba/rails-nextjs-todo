@@ -26,20 +26,22 @@
       "Bash(npm run lint)",
       "Bash(npm run format)",
       "Bash(npm run typecheck)"
-    ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/linuxbrew/.linuxbrew/bin/guardrails",
-            "timeout": 1000
-          }
-        ]
-      }
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Edit(**/.env*)",
+      "Write(**/.env*)",
+      "Read(**/master.key)",
+      "Edit(**/master.key)",
+      "Write(**/master.key)",
+      "Read(**/credentials*.enc)",
+      "Edit(**/credentials*.enc)",
+      "Write(**/credentials*.enc)",
+      "Read(**/.kamal/secrets*)",
+      "Edit(**/.kamal/secrets*)",
+      "Write(**/.kamal/secrets*)",
+      "Bash(printenv*)",
+      "Bash(env*)"
     ]
   },
   "enabledPlugins": {
@@ -50,7 +52,6 @@
     "commit-commands@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "complete-workflow-system@thkt-development-workflows": true,
     "code-simplifier@claude-plugins-official": true,
     "a11y-specialist-skills@a11y-specialist-skills": true,
     "pr-review-toolkit@claude-plugins-official": true,
