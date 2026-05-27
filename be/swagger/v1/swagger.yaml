@@ -312,6 +312,10 @@ components:
           type: string
         completed:
           type: boolean
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
         image_url:
           type: string
           nullable: true
@@ -325,6 +329,7 @@ components:
       - id
       - text
       - completed
+      - due_date
       - image_url
       - created_at
       - updated_at
@@ -338,6 +343,10 @@ components:
               type: string
             completed:
               type: boolean
+            due_date:
+              type: string
+              format: date-time
+              nullable: true
       required:
       - todo
     AuthInput:

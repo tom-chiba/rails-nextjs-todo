@@ -45,16 +45,22 @@ export default function Home() {
   });
 
   const addMutation = useTodosMutation({
-    mutationFn: (args: { text: string; image?: File }) =>
+    mutationFn: (args: {
+      text: string;
+      image?: File;
+      dueDate?: string | null;
+    }) =>
       postApiV1Todos({
         "todo[text]": args.text,
         ...(args.image ? { image: args.image } : {}),
+        ...(args.dueDate ? { "todo[due_date]": args.dueDate } : {}),
       }),
     updater: (args, todos) => [
       {
         id: -Date.now(),
         text: args.text,
         completed: false,
+        due_date: args.dueDate ?? null,
         image_url: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -93,13 +99,21 @@ export default function Home() {
       todos.map((t) => (t.id === id ? { ...t, text } : t)),
   });
 
+  const editDueDateMutation = useTodosMutation({
+    mutationFn: ({ id, dueDate }: { id: number; dueDate: string | null }) =>
+      patchApiV1TodosId(id, { todo: { due_date: dueDate } }),
+    updater: ({ id, dueDate }, todos) =>
+      todos.map((t) => (t.id === id ? { ...t, due_date: dueDate } : t)),
+  });
+
   const mutationError =
     addMutation.isError ||
     toggleMutation.isError ||
     deleteMutation.isError ||
     clearCompletedMutation.isError ||
     deleteImageMutation.isError ||
-    editMutation.isError;
+    editMutation.isError ||
+    editDueDateMutation.isError;
 
   // rerender-derived-state-no-effect: レンダー中に導出
   const filteredTodos =
@@ -160,7 +174,9 @@ export default function Home() {
 
         <main id="main-content">
           <TodoInput
-            onAdd={(text, image) => addMutation.mutate({ text, image })}
+            onAdd={(text, image, dueDate) =>
+              addMutation.mutate({ text, image, dueDate })
+            }
           />
 
           {mutationError && (
@@ -198,6 +214,9 @@ export default function Home() {
                 onDelete={(id) => deleteMutation.mutate(id)}
                 onDeleteImage={(id) => deleteImageMutation.mutate(id)}
                 onEdit={(id, text) => editMutation.mutate({ id, text })}
+                onEditDueDate={(id, dueDate) =>
+                  editDueDateMutation.mutate({ id, dueDate })
+                }
               />
               <TodoFooter
                 todos={todos}

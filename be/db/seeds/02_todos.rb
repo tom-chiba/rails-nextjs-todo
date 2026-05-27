@@ -5,9 +5,9 @@ dev_user = User.find_by!(email_address: "dev@example.com")
 SEED_TODOS = [
   { text: "牛乳を買う", completed: false, image: "milk.png" },
   { text: "メールに返信する", completed: true },
-  { text: "レポートを書く", completed: false },
+  { text: "レポートを書く", completed: false, due_date: 3.days.from_now.change(hour: 18) },
   { text: "部屋を掃除する", completed: true },
-  { text: "ランニングをする", completed: false }
+  { text: "ランニングをする", completed: false, due_date: 2.days.ago.change(hour: 7) }
 ].freeze
 
 SEED_TODOS.each do |attrs|

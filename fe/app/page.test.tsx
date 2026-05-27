@@ -86,6 +86,7 @@ beforeEach(() => {
         id: nextId++,
         text: input["todo[text]"],
         completed: false,
+        due_date: null,
         image_url: input.image ? "http://example.com/test.jpg" : null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

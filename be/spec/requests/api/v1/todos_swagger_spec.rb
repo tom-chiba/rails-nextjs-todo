@@ -35,17 +35,20 @@ RSpec.describe "Api::V1::Todos", type: :request do
       produces "application/json"
       parameter name: :"todo[text]", in: :formData, type: :string, required: true, description: "Todoテキスト"
       parameter name: :"todo[completed]", in: :formData, type: :boolean, required: false, description: "完了フラグ"
+      parameter name: :"todo[due_date]", in: :formData, type: :string, format: "date-time", required: false, description: "締切日時 (ISO 8601)"
       parameter name: :image, in: :formData, type: :file, required: false, description: "画像ファイル (JPEG, PNG, GIF, WebP / 最大5MB)"
 
       response "201", "作成成功" do
         schema "$ref" => "#/components/schemas/Todo"
         let(:"todo[text]") { "New todo" }
+        let(:"todo[due_date]") { "2026-06-01T09:00:00Z" }
         let(:image) { nil }
 
         run_test! do |response|
           json = response.parsed_body
           expect(json["text"]).to eq("New todo")
           expect(json["completed"]).to be false
+          expect(json["due_date"]).to eq("2026-06-01T09:00:00.000Z")
           expect(json["image_url"]).to be_nil
         end
       end
@@ -109,10 +112,11 @@ RSpec.describe "Api::V1::Todos", type: :request do
         schema "$ref" => "#/components/schemas/Todo"
         let(:todo) { create(:todo, user: user) }
         let(:id) { todo.id }
-        let(:params) { { todo: { completed: true } } }
+        let(:params) { { todo: { completed: true, due_date: "2026-06-01T09:00:00Z" } } }
 
         run_test! do |response|
           expect(response.parsed_body["completed"]).to be true
+          expect(response.parsed_body["due_date"]).to eq("2026-06-01T09:00:00.000Z")
         end
       end
 

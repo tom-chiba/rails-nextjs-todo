@@ -2,6 +2,12 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import {
+  formatDueDate,
+  inputValueToIso,
+  isOverdue,
+  isoToInputValue,
+} from "../lib/due-date";
 import type { Todo } from "../types";
 import { ImageLightbox } from "./image-lightbox";
 
@@ -11,6 +17,7 @@ type TodoItemProps = {
   onDelete: (id: number) => void;
   onDeleteImage?: (id: number) => void;
   onEdit: (id: number, text: string) => void;
+  onEditDueDate: (id: number, dueDate: string | null) => void;
 };
 
 export function TodoItem({
@@ -19,6 +26,7 @@ export function TodoItem({
   onDelete,
   onDeleteImage,
   onEdit,
+  onEditDueDate,
 }: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
@@ -29,6 +37,14 @@ export function TodoItem({
   const wasEditingRef = useRef(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const thumbnailButtonRef = useRef<HTMLButtonElement>(null);
+  const [isEditingDueDate, setIsEditingDueDate] = useState(false);
+  const [dueDateValue, setDueDateValue] = useState("");
+  const dueDateInputRef = useRef<HTMLInputElement>(null);
+  const overdue = isOverdue(todo.due_date, todo.completed);
+
+  useEffect(() => {
+    if (isEditingDueDate) dueDateInputRef.current?.focus();
+  }, [isEditingDueDate]);
 
   useEffect(() => {
     if (isEditing) {
@@ -84,6 +100,26 @@ export function TodoItem({
     skipBlurRef.current = false;
   };
 
+  const handleDueDateEditStart = () => {
+    setDueDateValue(isoToInputValue(todo.due_date));
+    setIsEditingDueDate(true);
+  };
+
+  const handleDueDateSave = () => {
+    onEditDueDate(todo.id, inputValueToIso(dueDateValue));
+    setIsEditingDueDate(false);
+  };
+
+  const handleDueDateClear = () => {
+    onEditDueDate(todo.id, null);
+    setIsEditingDueDate(false);
+  };
+
+  const handleDueDateSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleDueDateSave();
+  };
+
   return (
     <motion.li
       layout
@@ -135,6 +171,97 @@ export function TodoItem({
             {todo.text}
           </span>
         )}
+        <div className="mt-1.5 flex items-center gap-2">
+          {isEditingDueDate ? (
+            <form
+              onSubmit={handleDueDateSubmit}
+              className="flex items-center gap-2"
+            >
+              <input
+                ref={dueDateInputRef}
+                type="datetime-local"
+                value={dueDateValue}
+                onChange={(e) => setDueDateValue(e.target.value)}
+                className="ink-input text-xs text-ink-medium"
+                aria-label={`Due date for "${todo.text}"`}
+              />
+              <button
+                type="submit"
+                className="text-xs text-ink-faint transition-colors hover:text-ink-medium"
+              >
+                Save
+              </button>
+              {todo.due_date && (
+                <button
+                  type="button"
+                  onClick={handleDueDateClear}
+                  className="text-xs text-ink-faint transition-colors hover:text-accent-vermillion"
+                >
+                  Clear
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsEditingDueDate(false)}
+                className="text-xs text-ink-faint transition-colors hover:text-ink-medium"
+              >
+                Cancel
+              </button>
+            </form>
+          ) : todo.due_date ? (
+            <button
+              type="button"
+              onClick={handleDueDateEditStart}
+              className={`inline-flex items-center gap-1 rounded text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-vermillion ${
+                overdue
+                  ? "text-accent-vermillion"
+                  : "text-ink-light hover:text-ink-medium"
+              }`}
+              aria-label={`Due ${formatDueDate(todo.due_date)}${overdue ? " (overdue)" : ""}. Edit due date.`}
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <rect
+                  x="2"
+                  y="3"
+                  width="12"
+                  height="11"
+                  rx="1.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M2 6h12M5.5 1.5v3M10.5 1.5v3"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span>{formatDueDate(todo.due_date)}</span>
+              {overdue && (
+                <span className="font-medium tracking-wide uppercase">
+                  Overdue
+                </span>
+              )}
+            </button>
+          ) : (
+            !isEditing && (
+              <button
+                type="button"
+                onClick={handleDueDateEditStart}
+                className="text-xs text-ink-faint opacity-0 transition-all hover:text-ink-medium group-hover:opacity-100 focus:opacity-100"
+                aria-label={`Set due date for "${todo.text}"`}
+              >
+                Set due date
+              </button>
+            )
+          )}
+        </div>
         {todo.image_url && (
           <div className="mt-2 flex items-end gap-2">
             <button

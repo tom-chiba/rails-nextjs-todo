@@ -45,7 +45,7 @@ module Api
       end
 
       def todo_params
-        params.expect(todo: [ :text, :completed ])
+        params.expect(todo: [ :text, :completed, :due_date ])
       end
     end
   end

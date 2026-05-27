@@ -22,11 +22,12 @@ RSpec.configure do |config|
               id: { type: :integer },
               text: { type: :string },
               completed: { type: :boolean },
+              due_date: { type: :string, format: "date-time", nullable: true },
               image_url: { type: :string, nullable: true },
               created_at: { type: :string, format: "date-time" },
               updated_at: { type: :string, format: "date-time" }
             },
-            required: %w[id text completed image_url created_at updated_at]
+            required: %w[id text completed due_date image_url created_at updated_at]
           },
           TodoInput: {
             type: :object,
@@ -35,7 +36,8 @@ RSpec.configure do |config|
                 type: :object,
                 properties: {
                   text: { type: :string },
-                  completed: { type: :boolean }
+                  completed: { type: :boolean },
+                  due_date: { type: :string, format: "date-time", nullable: true }
                 }
               }
             },

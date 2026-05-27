@@ -10,6 +10,8 @@ export interface Todo {
   text: string;
   completed: boolean;
   /** @nullable */
+  due_date: string | null;
+  /** @nullable */
   image_url: string | null;
   created_at: string;
   updated_at: string;

@@ -17,6 +17,7 @@ function makeTodo(overrides: Partial<Todo> = {}): Todo {
     id: 1,
     text: "Test todo",
     completed: false,
+    due_date: null,
     image_url: null,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
