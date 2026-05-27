@@ -8,4 +8,6 @@
 export type TodoInputTodo = {
   text?: string;
   completed?: boolean;
+  /** @nullable */
+  due_date?: string | null;
 };

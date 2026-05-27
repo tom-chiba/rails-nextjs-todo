@@ -10,6 +10,7 @@ type TodoListProps = {
   onDelete: (id: number) => void;
   onDeleteImage?: (id: number) => void;
   onEdit: (id: number, text: string) => void;
+  onEditDueDate: (id: number, dueDate: string | null) => void;
 };
 
 export function TodoList({
@@ -18,6 +19,7 @@ export function TodoList({
   onDelete,
   onDeleteImage,
   onEdit,
+  onEditDueDate,
 }: TodoListProps) {
   if (todos.length === 0) {
     return <EmptyState />;
@@ -34,6 +36,7 @@ export function TodoList({
             onDelete={onDelete}
             onDeleteImage={onDeleteImage}
             onEdit={onEdit}
+            onEditDueDate={onEditDueDate}
           />
         ))}
       </AnimatePresence>
